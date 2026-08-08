@@ -72,7 +72,7 @@ type
     BotaoRestaurarAparencia: TSpeedButton;
     PainelAcoes: TPanel;
     LinhaDivisoriaAcoes: TPanel;
-    IconesAlternados: TImageList;
+    IconesBotoes: TImageList;
     BotaoReproduzir: TSpeedButton;
     BotaoInicio: TSpeedButton;
     BotaoRecuar: TSpeedButton;
@@ -649,7 +649,7 @@ begin
       MonitorAtual.BoundsRect.Height);
     FTelaCheia := True;
     BotaoTelaCheia.Hint := 'Sair da tela cheia';
-    BotaoTelaCheia.ImageIndex := Ord(iiaSairTelaCheia);
+    BotaoTelaCheia.ImageIndex := Ord(iibSairTelaCheia);
   end
   else
   begin
@@ -658,7 +658,7 @@ begin
     BoundsRect := FLimitesAnteriores;
     FTelaCheia := False;
     BotaoTelaCheia.Hint := 'Entrar em tela cheia';
-    BotaoTelaCheia.ImageIndex := Ord(iiaTelaCheia);
+    BotaoTelaCheia.ImageIndex := Ord(iibTelaCheia);
   end;
   ReaplicarProtecaoCaptura;
 end;

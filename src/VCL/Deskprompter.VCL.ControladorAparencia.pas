@@ -118,23 +118,23 @@ begin
   begin
     FBotaoEspelhoHorizontal.Hint := 'Desativar espelhamento horizontal';
     FBotaoEspelhoHorizontal.ImageIndex :=
-      Ord(iiaEspelhoHorizontalAtivo);
+      Ord(iibEspelhoHorizontalAtivo);
   end
   else
   begin
     FBotaoEspelhoHorizontal.Hint := 'Ativar espelhamento horizontal';
-    FBotaoEspelhoHorizontal.ImageIndex := Ord(iiaEspelhoHorizontal);
+    FBotaoEspelhoHorizontal.ImageIndex := Ord(iibEspelhoHorizontal);
   end;
 
   if FEstadoEspelhamento.Vertical then
   begin
     FBotaoEspelhoVertical.Hint := 'Desativar espelhamento vertical';
-    FBotaoEspelhoVertical.ImageIndex := Ord(iiaEspelhoVerticalAtivo);
+    FBotaoEspelhoVertical.ImageIndex := Ord(iibEspelhoVerticalAtivo);
   end
   else
   begin
     FBotaoEspelhoVertical.Hint := 'Ativar espelhamento vertical';
-    FBotaoEspelhoVertical.ImageIndex := Ord(iiaEspelhoVertical);
+    FBotaoEspelhoVertical.ImageIndex := Ord(iibEspelhoVertical);
   end;
 end;
 

@@ -101,12 +101,12 @@ begin
   if FMotor.Estado = erReproduzindo then
   begin
     FBotaoReproduzir.Hint := 'Pausar rolagem';
-    FBotaoReproduzir.ImageIndex := Ord(iiaPausar);
+    FBotaoReproduzir.ImageIndex := Ord(iibPausar);
   end
   else
   begin
     FBotaoReproduzir.Hint := 'Reproduzir rolagem';
-    FBotaoReproduzir.ImageIndex := Ord(iiaReproduzir);
+    FBotaoReproduzir.ImageIndex := Ord(iibReproduzir);
   end;
 end;
 
