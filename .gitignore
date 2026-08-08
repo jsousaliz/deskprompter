@@ -17,4 +17,6 @@ dcu/
 # Arquivos locais da IDE
 __history/
 *.projdata
-/docs
+
+# Planejamento local, não publicado no repositório
+/plan/

@@ -47,6 +47,7 @@
     <DCC_ExeOutput>..\bin\app</DCC_ExeOutput>
     <DCC_DcuOutput>..\dcu\app\$(Config)</DCC_DcuOutput>
     <DCC_DependencyCheckOutputName>Deskprompter.exe</DCC_DependencyCheckOutputName>
+    <Icon_MainIcon>Icones\Deskprompter.ico</Icon_MainIcon>
     <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_2)'!=''">

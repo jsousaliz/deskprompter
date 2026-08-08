@@ -25,6 +25,8 @@ uses
   Deskprompter.VCL.Icones in 'VCL\Deskprompter.VCL.Icones.pas',
   Deskprompter.VCL.FormularioPrincipal in 'VCL\Deskprompter.VCL.FormularioPrincipal.pas' {FormularioPrincipal};
 
+{$R *.res}
+
 var
   RaizComposicao: TRaizComposicao;
 
