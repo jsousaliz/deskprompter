@@ -21,6 +21,7 @@ type
     FPainelEspelho: TPanel;
     FPainelTextos: TPanel;
     FTextoAtivo: Boolean;
+    procedure AplicarMargemNoEditor;
     procedure AtualizarBotoesEspelho;
     procedure AtualizarVisibilidadeEspelho;
     procedure RedesenharEditor;
@@ -98,6 +99,17 @@ begin
   FEstadoEspelhamento.AlternarVertical;
   AtualizarBotoesEspelho;
   AtualizarVisibilidadeEspelho;
+end;
+
+procedure TControladorAparencia.AplicarMargemNoEditor;
+begin
+  if not FEditorTexto.HandleAllocated then
+    Exit;
+
+  FEditorTexto.Perform(
+    EM_SETMARGINS,
+    EC_LEFTMARGIN or EC_RIGHTMARGIN,
+    MakeLParam(FMargem, FMargem));
 end;
 
 procedure TControladorAparencia.AtualizarBotoesEspelho;
@@ -179,10 +191,7 @@ end;
 procedure TControladorAparencia.DefinirMargem(const AMargem: Integer);
 begin
   FMargem := Max(0, AMargem);
-  FEditorTexto.Perform(
-    EM_SETMARGINS,
-    EC_LEFTMARGIN or EC_RIGHTMARGIN,
-    MakeLParam(FMargem, FMargem));
+  AplicarMargemNoEditor;
   RedesenharEditor;
   InvalidarEspelho;
 end;
@@ -197,6 +206,8 @@ end;
 procedure TControladorAparencia.DefinirTextoAtivo(const AAtivo: Boolean);
 begin
   FTextoAtivo := AAtivo;
+  if FTextoAtivo then
+    AplicarMargemNoEditor;
   AtualizarVisibilidadeEspelho;
 end;
 

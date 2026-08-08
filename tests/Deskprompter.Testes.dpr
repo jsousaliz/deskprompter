@@ -17,6 +17,7 @@ uses
   Deskprompter.Aplicacao.Rolagem.Motor in '..\src\Aplicacao\Rolagem\Deskprompter.Aplicacao.Rolagem.Motor.pas',
   Deskprompter.Infraestrutura.Persistencia.SQLite.Banco in '..\src\Infraestrutura\Persistencia\SQLite\Deskprompter.Infraestrutura.Persistencia.SQLite.Banco.pas',
   Deskprompter.Infraestrutura.Persistencia.SQLite.Repositorios in '..\src\Infraestrutura\Persistencia\SQLite\Deskprompter.Infraestrutura.Persistencia.SQLite.Repositorios.pas',
+  Deskprompter.VCL.ControladorAparencia in '..\src\VCL\Deskprompter.VCL.ControladorAparencia.pas',
   Deskprompter.VCL.ControladorComandos in '..\src\VCL\Deskprompter.VCL.ControladorComandos.pas',
   Deskprompter.VCL.ControladorProtecaoCaptura in '..\src\VCL\Deskprompter.VCL.ControladorProtecaoCaptura.pas',
   Deskprompter.VCL.FormularioAtalhos in '..\src\VCL\Deskprompter.VCL.FormularioAtalhos.pas' {FormularioAtalhos},
@@ -25,6 +26,7 @@ uses
   Testes.Aplicacao.Aparencia.EstadoEspelhamento in 'Unitarios\Aplicacao\Testes.Aplicacao.Aparencia.EstadoEspelhamento.pas',
   Testes.Aplicacao.Comandos in 'Unitarios\Aplicacao\Testes.Aplicacao.Comandos.pas',
   Testes.Aplicacao.Rolagem.Motor in 'Unitarios\Aplicacao\Testes.Aplicacao.Rolagem.Motor.pas',
+  Testes.VCL.ControladorAparencia in 'Unitarios\VCL\Testes.VCL.ControladorAparencia.pas',
   Testes.VCL.FormularioAtalhos in 'Unitarios\VCL\Testes.VCL.FormularioAtalhos.pas',
   Testes.VCL.ControladorProtecaoCaptura in 'Unitarios\VCL\Testes.VCL.ControladorProtecaoCaptura.pas',
   Testes.Integracao.Persistencia.SQLite in 'Integracao\Persistencia\Testes.Integracao.Persistencia.SQLite.pas';

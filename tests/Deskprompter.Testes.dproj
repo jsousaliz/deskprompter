@@ -76,6 +76,7 @@
         <DCCReference Include="..\src\Aplicacao\Rolagem\Deskprompter.Aplicacao.Rolagem.Motor.pas"/>
         <DCCReference Include="..\src\Infraestrutura\Persistencia\SQLite\Deskprompter.Infraestrutura.Persistencia.SQLite.Banco.pas"/>
         <DCCReference Include="..\src\Infraestrutura\Persistencia\SQLite\Deskprompter.Infraestrutura.Persistencia.SQLite.Repositorios.pas"/>
+        <DCCReference Include="..\src\VCL\Deskprompter.VCL.ControladorAparencia.pas"/>
         <DCCReference Include="..\src\VCL\Deskprompter.VCL.ControladorComandos.pas"/>
         <DCCReference Include="..\src\VCL\Deskprompter.VCL.ControladorProtecaoCaptura.pas"/>
         <DCCReference Include="..\src\VCL\Deskprompter.VCL.FormularioAtalhos.pas">
@@ -86,6 +87,7 @@
         <DCCReference Include="Unitarios\Aplicacao\Testes.Aplicacao.Aparencia.EstadoEspelhamento.pas"/>
         <DCCReference Include="Unitarios\Aplicacao\Testes.Aplicacao.Comandos.pas"/>
         <DCCReference Include="Unitarios\Aplicacao\Testes.Aplicacao.Rolagem.Motor.pas"/>
+        <DCCReference Include="Unitarios\VCL\Testes.VCL.ControladorAparencia.pas"/>
         <DCCReference Include="Unitarios\VCL\Testes.VCL.FormularioAtalhos.pas"/>
         <DCCReference Include="Unitarios\VCL\Testes.VCL.ControladorProtecaoCaptura.pas"/>
         <DCCReference Include="Integracao\Persistencia\Testes.Integracao.Persistencia.SQLite.pas"/>
