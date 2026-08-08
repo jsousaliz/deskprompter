@@ -40,6 +40,7 @@ type
     BotaoNovoTexto: TSpeedButton;
     BotaoRenomear: TSpeedButton;
     BotaoCima: TSpeedButton;
+    BarraRolagemEspelho: TScrollBar;
     Divisor: TSplitter;
     PainelAcoesBiblioteca: TPanel;
     PainelArvore: TPanel;
@@ -52,10 +53,13 @@ type
     TemporizadorRolagem: TTimer;
     TemporizadorSalvamento: TTimer;
     TemporizadorPreferencias: TTimer;
+    TemporizadorAvisoEspelhamento: TTimer;
     PanelTextos: TPanel;
     EditorTexto: TRichEdit;
     PainelGrupoTexto: TPanel;
     RotuloGrupoTexto: TLabel;
+    PainelAvisoEspelhamento: TPanel;
+    RotuloAvisoEspelhamento: TLabel;
     BotaoOcultarOpcoes: TSpeedButton;
     BotaoAtalhos: TSpeedButton;
     RotuloSemTexto: TLabel;
@@ -100,6 +104,7 @@ type
     TamanhoFonte: TTrackBar;
     Velocidade: TTrackBar;
     procedure AparenciaChange(Sender: TObject);
+    procedure BarraRolagemEspelhoChange(Sender: TObject);
     procedure ArvoreConteudoChange(Sender: TObject; Node: TTreeNode);
     procedure ArvoreConteudoChanging(Sender: TObject; Node: TTreeNode;
       var AllowChange: Boolean);
@@ -128,6 +133,8 @@ type
     procedure BotaoTextoAnteriorClick(Sender: TObject);
     procedure BotaoProximoTextoClick(Sender: TObject);
     procedure ChaveProtecaoCapturaClick(Sender: TObject);
+    procedure DesenhoEspelhoMouseDown(Sender: TObject;
+      Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure DesenhoEspelhoPaint(Sender: TObject);
     procedure EditorTextoChange(Sender: TObject);
     procedure ListaFontesChange(Sender: TObject);
@@ -137,12 +144,14 @@ type
     procedure FormularioKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure FormularioResize(Sender: TObject);
+    procedure TemporizadorAvisoEspelhamentoTimer(Sender: TObject);
     procedure TemporizadorRolagemTimer(Sender: TObject);
     procedure TemporizadorPreferenciasTimer(Sender: TObject);
     procedure TemporizadorSalvamentoTimer(Sender: TObject);
     procedure ValoresChange(Sender: TObject);
   private
     FAlteracaoPendente: Boolean;
+    FAtualizandoBarraRolagemEspelho: Boolean;
     FAtualizandoEditor: Boolean;
     FAtualizandoPreferencias: Boolean;
     FControladorAparencia: TControladorAparencia;
@@ -157,6 +166,7 @@ type
     FRepositorioPreferencias: IRepositorioPreferencias;
     FTelaCheia: Boolean;
     FOpcoesVisiveis: Boolean;
+    FPassoDestaqueAvisoEspelhamento: Integer;
     FPreferencias: TPreferencias;
     FPreferenciasPendentes: Boolean;
     procedure AplicarOpacidade;
@@ -164,6 +174,8 @@ type
     procedure AgendarSalvamentoPreferencias;
     procedure AtualizarAcoesBiblioteca;
     procedure AtualizarAreaDeTexto;
+    procedure AtualizarAvisoEspelhamento;
+    procedure AtualizarBarraRolagemEspelho;
     procedure AtualizarRotulosAparencia;
     procedure AtualizarRotulosValores;
     procedure AtualizarTituloApresentado(const ATexto: TTexto);
@@ -172,6 +184,7 @@ type
     procedure CriarControladores;
     procedure DefinirTelaCheia(const AAtivar: Boolean);
     procedure DefinirVisibilidadeOpcoes(const AVisiveis: Boolean);
+    procedure DestacarAvisoEspelhamento;
     procedure ExecutarComando(const AComando: TComando);
     procedure InicializarEstadoDaInterface;
     procedure NotificarAlteracaoAparencia(
@@ -210,6 +223,12 @@ uses
   Deskprompter.Dominio.Grupos,
   Deskprompter.VCL.Icones;
 
+const
+  COR_AVISO_ESPELHAMENTO = $00303030;
+  COR_AVISO_ESPELHAMENTO_DESTAQUE = $004040C0;
+  COR_TEXTO_AVISO_ESPELHAMENTO = $0047A5FF;
+  TOTAL_PASSOS_DESTAQUE_AVISO = 6;
+
 procedure TFormularioPrincipal.AparenciaChange(Sender: TObject);
 begin
   if Sender = TamanhoFonte then
@@ -218,6 +237,14 @@ begin
     FControladorAparencia.DefinirMargem(MargemTexto.Position);
   AtualizarRotulosAparencia;
   NotificarAlteracaoAparencia(True);
+end;
+
+procedure TFormularioPrincipal.BarraRolagemEspelhoChange(Sender: TObject);
+begin
+  if FAtualizandoBarraRolagemEspelho then
+    Exit;
+
+  FControladorRolagem.DefinirPosicao(BarraRolagemEspelho.Position);
 end;
 
 procedure TFormularioPrincipal.AgendarSalvamentoPreferencias;
@@ -269,6 +296,7 @@ begin
       FPreferencias.EspelhoVertical);
     FControladorRolagem.DefinirVelocidade(Velocidade.Position);
     AplicarOpacidade;
+    AtualizarAvisoEspelhamento;
     AtualizarRotulosAparencia;
     AtualizarRotulosValores;
   finally
@@ -330,6 +358,51 @@ begin
     FControladorRolagem.RecalcularLimite;
   if Assigned(FControladorAparencia) then
     FControladorAparencia.InvalidarEspelho;
+  AtualizarBarraRolagemEspelho;
+end;
+
+procedure TFormularioPrincipal.AtualizarAvisoEspelhamento;
+var
+  AvisoVisivel: Boolean;
+begin
+  AvisoVisivel := False;
+  if Assigned(FControladorAparencia) then
+    AvisoVisivel := (TextoSelecionado <> nil) and
+      (FControladorAparencia.EspelhoHorizontal() or
+       FControladorAparencia.EspelhoVertical());
+  PainelAvisoEspelhamento.Visible := AvisoVisivel;
+
+  if AvisoVisivel then
+    PainelAvisoEspelhamento.BringToFront
+  else
+  begin
+    TemporizadorAvisoEspelhamento.Enabled := False;
+    FPassoDestaqueAvisoEspelhamento := 0;
+    PainelAvisoEspelhamento.Color := COR_AVISO_ESPELHAMENTO;
+    RotuloAvisoEspelhamento.Font.Color := COR_TEXTO_AVISO_ESPELHAMENTO;
+  end;
+end;
+
+procedure TFormularioPrincipal.AtualizarBarraRolagemEspelho;
+var
+  Limite: Integer;
+begin
+  if not Assigned(FControladorRolagem) then
+    Exit;
+
+  Limite := Max(0, Ceil(FControladorRolagem.Limite));
+  FAtualizandoBarraRolagemEspelho := True;
+  try
+    BarraRolagemEspelho.Max := Limite;
+    BarraRolagemEspelho.Enabled := Limite > 0;
+    BarraRolagemEspelho.Position := EnsureRange(
+      Round(FControladorRolagem.Posicao),
+      BarraRolagemEspelho.Min,
+      BarraRolagemEspelho.Max);
+    BarraRolagemEspelho.LargeChange := Max(1, DesenhoEspelho.Height div 2);
+  finally
+    FAtualizandoBarraRolagemEspelho := False;
+  end;
 end;
 
 procedure TFormularioPrincipal.AtualizarRotulosAparencia;
@@ -420,12 +493,14 @@ end;
 procedure TFormularioPrincipal.BotaoEspelhoHorizontalClick(Sender: TObject);
 begin
   FControladorAparencia.AlternarEspelhoHorizontal;
+  AtualizarAvisoEspelhamento;
   NotificarAlteracaoAparencia;
 end;
 
 procedure TFormularioPrincipal.BotaoEspelhoVerticalClick(Sender: TObject);
 begin
   FControladorAparencia.AlternarEspelhoVertical;
+  AtualizarAvisoEspelhamento;
   NotificarAlteracaoAparencia;
 end;
 
@@ -687,6 +762,27 @@ begin
     FControladorRolagem.Posicao);
 end;
 
+procedure TFormularioPrincipal.DesenhoEspelhoMouseDown(
+  Sender: TObject;
+  Button: TMouseButton;
+  Shift: TShiftState;
+  X, Y: Integer);
+begin
+  DestacarAvisoEspelhamento;
+end;
+
+procedure TFormularioPrincipal.DestacarAvisoEspelhamento;
+begin
+  if not PainelAvisoEspelhamento.Visible then
+    Exit;
+
+  TemporizadorAvisoEspelhamento.Enabled := False;
+  FPassoDestaqueAvisoEspelhamento := 0;
+  PainelAvisoEspelhamento.Color := COR_AVISO_ESPELHAMENTO_DESTAQUE;
+  RotuloAvisoEspelhamento.Font.Color := clWhite;
+  TemporizadorAvisoEspelhamento.Enabled := True;
+end;
+
 procedure TFormularioPrincipal.EditorTextoChange(Sender: TObject);
 var
   Texto: TTexto;
@@ -776,6 +872,7 @@ end;
 
 procedure TFormularioPrincipal.FormularioDestroy(Sender: TObject);
 begin
+  TemporizadorAvisoEspelhamento.Enabled := False;
   FControladorComandos.Free;
   FPreferencias.Free;
   FControladorProtecaoCaptura.Free;
@@ -862,6 +959,7 @@ end;
 
 procedure TFormularioPrincipal.RolagemAlterada(Sender: TObject);
 begin
+  AtualizarBarraRolagemEspelho;
   FControladorAparencia.InvalidarEspelho;
 end;
 
@@ -925,6 +1023,31 @@ begin
   RotuloSemTexto.Visible := not TemTexto;
   FControladorAparencia.DefinirTextoAtivo(TemTexto);
   FControladorRolagem.DefinirTextoAtivo(TemTexto);
+  AtualizarAreaDeTexto;
+  AtualizarAvisoEspelhamento;
+end;
+
+procedure TFormularioPrincipal.TemporizadorAvisoEspelhamentoTimer(
+  Sender: TObject);
+begin
+  Inc(FPassoDestaqueAvisoEspelhamento);
+  if Odd(FPassoDestaqueAvisoEspelhamento) then
+  begin
+    PainelAvisoEspelhamento.Color := COR_AVISO_ESPELHAMENTO;
+    RotuloAvisoEspelhamento.Font.Color := COR_TEXTO_AVISO_ESPELHAMENTO;
+  end
+  else
+  begin
+    PainelAvisoEspelhamento.Color := COR_AVISO_ESPELHAMENTO_DESTAQUE;
+    RotuloAvisoEspelhamento.Font.Color := clWhite;
+  end;
+
+  if FPassoDestaqueAvisoEspelhamento >= TOTAL_PASSOS_DESTAQUE_AVISO then
+  begin
+    TemporizadorAvisoEspelhamento.Enabled := False;
+    PainelAvisoEspelhamento.Color := COR_AVISO_ESPELHAMENTO;
+    RotuloAvisoEspelhamento.Font.Color := COR_TEXTO_AVISO_ESPELHAMENTO;
+  end;
 end;
 
 procedure TFormularioPrincipal.TemporizadorRolagemTimer(Sender: TObject);

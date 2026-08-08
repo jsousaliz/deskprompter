@@ -233,48 +233,74 @@ procedure TControladorAparencia.PintarEspelho(
   const APosicaoRolagem: Double);
 var
   AreaTexto: TRect;
+  AlturaDestino: Integer;
+  DestinoX: Integer;
+  DestinoY: Integer;
   EstadoDC: Integer;
-  Transformacao: TXForm;
+  ImagemTexto: Vcl.Graphics.TBitmap;
+  LarguraDestino: Integer;
+  TopoTexto: Integer;
 begin
-  ACanvas.Brush.Color := FEditorTexto.Color;
-  ACanvas.FillRect(AArea);
-  ACanvas.Font.Assign(FEditorTexto.Font);
-  ACanvas.Brush.Style := bsClear;
+  if (AArea.Width <= 0) or (AArea.Height <= 0) then
+    Exit;
 
-  EstadoDC := SaveDC(ACanvas.Handle);
+  ImagemTexto := Vcl.Graphics.TBitmap.Create;
   try
-    SetGraphicsMode(ACanvas.Handle, GM_ADVANCED);
-    Transformacao.eM11 := 1;
-    Transformacao.eM12 := 0;
-    Transformacao.eM21 := 0;
-    Transformacao.eM22 := 1;
-    Transformacao.eDx := 0;
-    Transformacao.eDy := 0;
-    if FEstadoEspelhamento.Horizontal then
-    begin
-      Transformacao.eM11 := -1;
-      Transformacao.eDx := AArea.Width;
-    end;
-    if FEstadoEspelhamento.Vertical then
-    begin
-      Transformacao.eM22 := -1;
-      Transformacao.eDy := AArea.Height;
-    end;
-    SetWorldTransform(ACanvas.Handle, Transformacao);
+    ImagemTexto.PixelFormat := pf32bit;
+    ImagemTexto.SetSize(AArea.Width, AArea.Height);
+    ImagemTexto.Canvas.Brush.Color := FEditorTexto.Color;
+    ImagemTexto.Canvas.FillRect(Rect(0, 0, AArea.Width, AArea.Height));
+    ImagemTexto.Canvas.Font.Assign(FEditorTexto.Font);
+    ImagemTexto.Canvas.Brush.Style := bsClear;
 
+    TopoTexto := -Round(APosicaoRolagem);
     AreaTexto := Rect(
       FMargem,
-      FMargem - Round(APosicaoRolagem),
-      Max(FMargem, AArea.Width - FMargem),
-      FMargem - Round(APosicaoRolagem) + 100000);
+      TopoTexto,
+      Max(FMargem + 1, AArea.Width - FMargem),
+      TopoTexto + 100000);
     DrawText(
-      ACanvas.Handle,
+      ImagemTexto.Canvas.Handle,
       PChar(FEditorTexto.Text),
       Length(FEditorTexto.Text),
       AreaTexto,
       DT_LEFT or DT_TOP or DT_WORDBREAK or DT_NOPREFIX);
+
+    DestinoX := AArea.Left;
+    DestinoY := AArea.Top;
+    LarguraDestino := AArea.Width;
+    AlturaDestino := AArea.Height;
+    if FEstadoEspelhamento.Horizontal then
+    begin
+      DestinoX := AArea.Right - 1;
+      LarguraDestino := -AArea.Width;
+    end;
+    if FEstadoEspelhamento.Vertical then
+    begin
+      DestinoY := AArea.Bottom - 1;
+      AlturaDestino := -AArea.Height;
+    end;
+
+    EstadoDC := SaveDC(ACanvas.Handle);
+    try
+      SetStretchBltMode(ACanvas.Handle, COLORONCOLOR);
+      StretchBlt(
+        ACanvas.Handle,
+        DestinoX,
+        DestinoY,
+        LarguraDestino,
+        AlturaDestino,
+        ImagemTexto.Canvas.Handle,
+        0,
+        0,
+        ImagemTexto.Width,
+        ImagemTexto.Height,
+        SRCCOPY);
+    finally
+      RestoreDC(ACanvas.Handle, EstadoDC);
+    end;
   finally
-    RestoreDC(ACanvas.Handle, EstadoDC);
+    ImagemTexto.Free;
   end;
 end;
 

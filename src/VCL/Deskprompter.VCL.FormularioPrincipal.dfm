@@ -824,7 +824,22 @@ object FormularioPrincipal: TFormularioPrincipal
         Top = 16
         Width = 233
         Height = 137
+        OnMouseDown = DesenhoEspelhoMouseDown
         OnPaint = DesenhoEspelhoPaint
+      end
+      object BarraRolagemEspelho: TScrollBar
+        Left = 248
+        Top = 0
+        Width = 17
+        Height = 166
+        Align = alRight
+        Kind = sbVertical
+        LargeChange = 120
+        Max = 0
+        PageSize = 0
+        SmallChange = 30
+        TabOrder = 0
+        OnChange = BarraRolagemEspelhoChange
       end
     end
     object PainelGrupoTexto: TPanel
@@ -839,10 +854,16 @@ object FormularioPrincipal: TFormularioPrincipal
       ParentBackground = False
       TabOrder = 2
       object RotuloGrupoTexto: TLabel
+        AlignWithMargins = True
         Left = 20
         Top = 16
-        Width = 700
-        Height = 30
+        Width = 486
+        Height = 29
+        Margins.Left = 20
+        Margins.Top = 16
+        Margins.Right = 12
+        Margins.Bottom = 12
+        Align = alClient
         AutoSize = False
         Caption = 'Grupo - Texto'
         Font.Charset = DEFAULT_CHARSET
@@ -851,6 +872,44 @@ object FormularioPrincipal: TFormularioPrincipal
         Font.Name = 'Segoe UI'
         Font.Style = [fsBold]
         ParentFont = False
+        ExplicitWidth = 946
+      end
+      object PainelAvisoEspelhamento: TPanel
+        AlignWithMargins = True
+        Left = 526
+        Top = 12
+        Width = 440
+        Height = 33
+        Margins.Left = 8
+        Margins.Top = 12
+        Margins.Right = 12
+        Margins.Bottom = 12
+        Align = alRight
+        BevelOuter = bvNone
+        Color = 3158064
+        ParentBackground = False
+        TabOrder = 1
+        Visible = False
+        object RotuloAvisoEspelhamento: TLabel
+          Left = 0
+          Top = 0
+          Width = 440
+          Height = 33
+          Align = alClient
+          Alignment = taCenter
+          AutoSize = False
+          Caption = 
+            'Edi'#231#227'o bloqueada: texto espelhado. Remova o espelhamento para ed' +
+            'itar.'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = 4695551
+          Font.Height = -12
+          Font.Name = 'Segoe UI'
+          Font.Style = []
+          ParentFont = False
+          Layout = tlCenter
+          WordWrap = True
+        end
       end
       object LinhaDivisoriaControles: TPanel
         Left = 0
@@ -1093,7 +1152,7 @@ object FormularioPrincipal: TFormularioPrincipal
       end
       object BotaoTextoAnterior: TSpeedButton
         Left = 9
-        Top = 178
+        Top = 218
         Width = 32
         Height = 32
         Hint = 'Abrir o texto anterior do grupo'
@@ -1161,7 +1220,7 @@ object FormularioPrincipal: TFormularioPrincipal
       end
       object BotaoProximoTexto: TSpeedButton
         Left = 9
-        Top = 218
+        Top = 178
         Width = 32
         Height = 32
         Hint = 'Abrir o proximo texto do grupo'
@@ -1701,10 +1760,6 @@ object FormularioPrincipal: TFormularioPrincipal
           Position = 60
           TabOrder = 0
           OnChange = ValoresChange
-          ExplicitLeft = 6
-          ExplicitTop = -2
-          ExplicitWidth = 113
-          ExplicitHeight = 32
         end
       end
       object PainelTransparencia: TPanel
@@ -1791,6 +1846,13 @@ object FormularioPrincipal: TFormularioPrincipal
         end
       end
     end
+  end
+  object TemporizadorAvisoEspelhamento: TTimer
+    Enabled = False
+    Interval = 140
+    OnTimer = TemporizadorAvisoEspelhamentoTimer
+    Left = 1024
+    Top = 400
   end
   object TemporizadorRolagem: TTimer
     Interval = 16

@@ -30,9 +30,11 @@ type
     procedure AlternarReproducao;
     procedure Avancar;
     procedure ConfigurarRelogio(const ARelogio: IRelogio);
+    procedure DefinirPosicao(const APosicao: Integer);
     procedure DefinirTextoAtivo(const AAtivo: Boolean);
     procedure DefinirVelocidade(const AVelocidade: Integer);
     procedure Inicio;
+    function Limite: Double;
     function Posicao: Double;
     procedure RecalcularLimite;
     procedure Recuar;
@@ -145,6 +147,15 @@ begin
     RecalcularLimite;
 end;
 
+procedure TControladorRolagem.DefinirPosicao(const APosicao: Integer);
+begin
+  if not FTextoAtivo then
+    Exit;
+
+  FMotor.DefinirPosicao(APosicao);
+  AplicarPosicao;
+end;
+
 procedure TControladorRolagem.DefinirVelocidade(const AVelocidade: Integer);
 begin
   FMotor.DefinirVelocidade(AVelocidade);
@@ -164,6 +175,11 @@ begin
   FMotor.Parar;
   AplicarPosicao;
   AtualizarBotaoReproduzir;
+end;
+
+function TControladorRolagem.Limite: Double;
+begin
+  Result := FMotor.Limite;
 end;
 
 function TControladorRolagem.Posicao: Double;
@@ -188,6 +204,8 @@ begin
   else
     Limite := 0;
   FMotor.DefinirLimite(Limite);
+  if Assigned(FPosicaoAlterada) then
+    FPosicaoAlterada(Self);
 end;
 
 procedure TControladorRolagem.Recuar;
