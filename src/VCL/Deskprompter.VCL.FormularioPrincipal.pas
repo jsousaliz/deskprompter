@@ -108,6 +108,8 @@ type
     procedure ArvoreConteudoChange(Sender: TObject; Node: TTreeNode);
     procedure ArvoreConteudoChanging(Sender: TObject; Node: TTreeNode;
       var AllowChange: Boolean);
+    procedure ArvoreConteudoCustomDrawItem(Sender: TCustomTreeView;
+      Node: TTreeNode; State: TCustomDrawState; var DefaultDraw: Boolean);
     procedure ArvoreConteudoDragDrop(Sender, Source: TObject; X, Y: Integer);
     procedure ArvoreConteudoDragOver(Sender, Source: TObject; X, Y: Integer;
       State: TDragState; var Accept: Boolean);
@@ -227,6 +229,7 @@ const
   COR_AVISO_ESPELHAMENTO = $00303030;
   COR_AVISO_ESPELHAMENTO_DESTAQUE = $004040C0;
   COR_TEXTO_AVISO_ESPELHAMENTO = $0047A5FF;
+  COR_ITEM_SELECIONADO_ARVORE = $003D3737;
   TOTAL_PASSOS_DESTAQUE_AVISO = 6;
 
 procedure TFormularioPrincipal.AparenciaChange(Sender: TObject);
@@ -319,6 +322,20 @@ procedure TFormularioPrincipal.ArvoreConteudoChanging(
 begin
   FControladorBiblioteca.SalvarAntesDeAlterarSelecao;
   AllowChange := True;
+end;
+
+procedure TFormularioPrincipal.ArvoreConteudoCustomDrawItem(
+  Sender: TCustomTreeView;
+  Node: TTreeNode;
+  State: TCustomDrawState;
+  var DefaultDraw: Boolean);
+begin
+  if Node.Selected then
+  begin
+    Sender.Canvas.Brush.Color := COR_ITEM_SELECIONADO_ARVORE;
+    Sender.Canvas.Font.Color := clWhite;
+  end;
+  DefaultDraw := True;
 end;
 
 procedure TFormularioPrincipal.ArvoreConteudoDragDrop(
@@ -812,10 +829,6 @@ end;
 
 procedure TFormularioPrincipal.ConfigurarFormularioEmTempoDeExecucao;
 begin
-  Application.HintColor := $00252525;
-  Application.HintPause := 400;
-  Application.HintHidePause := 5000;
-  Screen.HintFont.Color := clWhite;
   EditorTexto.Align := alClient;
   PainelEspelho.Align := alClient;
   PainelEspelho.BorderStyle := bsNone;

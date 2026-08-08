@@ -224,6 +224,7 @@ object FormularioPrincipal: TFormularioPrincipal
       TabOrder = 1
       OnChange = ArvoreConteudoChange
       OnChanging = ArvoreConteudoChanging
+      OnCustomDrawItem = ArvoreConteudoCustomDrawItem
       OnDragDrop = ArvoreConteudoDragDrop
       OnDragOver = ArvoreConteudoDragOver
     end
