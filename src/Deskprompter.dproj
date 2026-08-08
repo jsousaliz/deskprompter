@@ -49,6 +49,13 @@
     <DCC_DependencyCheckOutputName>Deskprompter.exe</DCC_DependencyCheckOutputName>
     <Icon_MainIcon>Icones\Deskprompter.ico</Icon_MainIcon>
     <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+    <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+    <VerInfo_MajorVer>0</VerInfo_MajorVer>
+    <VerInfo_MinorVer>1</VerInfo_MinorVer>
+    <VerInfo_Release>0</VerInfo_Release>
+    <VerInfo_Build>0</VerInfo_Build>
+    <VerInfo_Locale>1046</VerInfo_Locale>
+    <VerInfo_Keys>CompanyName=;FileDescription=Teleprompter para Windows;FileVersion=$(VerInfo_MajorVer).$(VerInfo_MinorVer).$(VerInfo_Release).$(VerInfo_Build);InternalName=Deskprompter;LegalCopyright=;LegalTrademarks=;OriginalFilename=Deskprompter.exe;ProgramID=com.deskprompter.app;ProductName=Deskprompter;ProductVersion=$(VerInfo_MajorVer).$(VerInfo_MinorVer).$(VerInfo_Release);Comments=</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Cfg_2)'!=''">
     <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>

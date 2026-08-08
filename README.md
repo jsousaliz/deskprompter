@@ -67,6 +67,25 @@ dcu/
 └── tests/<Configuracao>/
 ```
 
+## Instalador
+
+O instalador tradicional é gerado com o Inno Setup 6 a partir de
+`tools/instalador/Deskprompter.iss`:
+
+1. Compile `Deskprompter.exe` na configuração `Release`.
+2. Abra `tools/instalador/Deskprompter.iss` no Inno Setup.
+3. Compile o script.
+
+O pacote resultante é criado em `bin/instalador/`. A versão do instalador deve
+ser mantida igual à versão configurada em `src/Deskprompter.dproj`.
+
+O workflow `Criar release Deskprompter` permite executar o mesmo processo pelo
+GitHub Actions usando um runner Windows auto-hospedado com Delphi 12, Inno Setup
+6 e GitHub CLI. Com `publicar_release` desligado, ele apenas valida e armazena o
+instalador como artefato. Quando ligado, também cria a tag e o GitHub Release.
+As notas podem ser geradas automaticamente pelo GitHub ou lidas do arquivo
+`docs/notas-de-versao/v<versao>.md`.
+
 ## Testes automatizados
 
 O projeto `Deskprompter.Testes.exe` utiliza DUnitX e reúne testes de unidade e de
@@ -105,6 +124,9 @@ src/
 tests/
 ├── Unitarios/
 └── Integracao/
+
+docs/notas-de-versao/   notas manuais publicadas nos releases
+tools/instalador/       script de compilação e definição do instalador
 ```
 
 A solução mantém as regras independentes da interface sempre que possível. A

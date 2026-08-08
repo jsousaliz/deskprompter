@@ -1,0 +1,111 @@
+name: Criar release Deskprompter
+
+on:
+  workflow_dispatch:
+    inputs:
+      versao:
+        description: 'Versao sem o prefixo v, por exemplo: 0.1.0'
+        required: true
+        type: string
+      modo_notas:
+        description: 'Origem das notas da release'
+        required: true
+        default: arquivo
+        type: choice
+        options:
+          - arquivo
+          - automaticas
+      publicar_release:
+        description: 'Criar a tag e publicar a release depois das validacoes'
+        required: true
+        default: false
+        type: boolean
+
+concurrency:
+  group: release-deskprompter
+  cancel-in-progress: false
+
+jobs:
+  criar-release:
+    if: github.actor == 'jsousaliz' && github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, Windows, X64, delphi12]
+    timeout-minutes: 30
+
+    permissions:
+      contents: write
+
+    env:
+      VERSAO: ${{ inputs.versao }}
+      TAG: v${{ inputs.versao }}
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - name: Obter codigo-fonte
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Validar solicitacao
+        shell: powershell
+        run: |
+          if ($env:VERSAO -notmatch '^\d+\.\d+\.\d+$') {
+            throw "Versao invalida: $env:VERSAO. Use o formato 0.1.0."
+          }
+
+          if ($env:VERSAO -eq '0.0.0') {
+            throw 'A versao 0.0.0 e reservada para builds de desenvolvimento.'
+          }
+
+          $tagRemota = git ls-remote --tags origin "refs/tags/$env:TAG"
+          if ($tagRemota) {
+            throw "A tag $env:TAG ja existe."
+          }
+
+          if ('${{ inputs.modo_notas }}' -eq 'arquivo') {
+            $arquivoNotas = "docs\notas-de-versao\$env:TAG.md"
+            if (-not (Test-Path -LiteralPath $arquivoNotas -PathType Leaf)) {
+              throw "Arquivo de notas nao encontrado: $arquivoNotas"
+            }
+          }
+
+      - name: Compilar, testar e construir instalador
+        shell: powershell
+        run: |
+          .\tools\instalador\Construir.ps1 -Versao $env:VERSAO
+
+      - name: Armazenar artefatos da execucao
+        uses: actions/upload-artifact@v6
+        with:
+          name: Deskprompter-${{ inputs.versao }}
+          path: |
+            dist/Deskprompter-Setup-${{ inputs.versao }}.exe
+            dist/Deskprompter-Setup-${{ inputs.versao }}.exe.sha256
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Publicar release
+        if: inputs.publicar_release
+        shell: powershell
+        run: |
+          $instalador = "dist\Deskprompter-Setup-$env:VERSAO.exe"
+          $checksum = "$instalador.sha256"
+          $argumentos = @(
+            'release', 'create', $env:TAG,
+            $instalador,
+            $checksum,
+            '--target', '${{ github.sha }}',
+            '--title', "Deskprompter $env:TAG",
+            '--fail-on-no-commits'
+          )
+
+          if ('${{ inputs.modo_notas }}' -eq 'arquivo') {
+            $argumentos += @('--notes-file', "docs\notas-de-versao\$env:TAG.md")
+          }
+          else {
+            $argumentos += '--generate-notes'
+          }
+
+          & gh @argumentos
+          if ($LASTEXITCODE -ne 0) {
+            throw "Falha ao publicar a release $env:TAG."
+          }

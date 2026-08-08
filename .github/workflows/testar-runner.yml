@@ -1,0 +1,52 @@
+name: Testar runner Delphi
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  testar-runner:
+    if: github.actor == 'jsousaliz'
+    runs-on: [self-hosted, Windows, X64, delphi12]
+    timeout-minutes: 10
+
+    steps:
+      - name: Exibir informacoes do runner
+        shell: powershell
+        run: |
+          Write-Host "Usuario: $env:USERNAME"
+          Write-Host "Computador: $env:COMPUTERNAME"
+          Write-Host "Diretorio: $PWD"
+
+      - name: Verificar ferramentas
+        shell: powershell
+        run: |
+          $delphi = 'C:\Program Files (x86)\Embarcadero\Studio\23.0'
+          $dcc64 = Join-Path $delphi 'bin\dcc64.exe'
+          $msbuild = 'C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe'
+          $inno = @(
+            'C:\Program Files (x86)\Inno Setup 6\ISCC.exe',
+            'C:\Program Files\Inno Setup 6\ISCC.exe',
+            (Join-Path $env:LOCALAPPDATA 'Programs\Inno Setup 6\ISCC.exe')
+          ) | Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } |
+            Select-Object -First 1
+
+          if (-not (Test-Path -LiteralPath $dcc64 -PathType Leaf)) {
+            throw "Compilador Win64 nao encontrado: $dcc64"
+          }
+          if (-not (Test-Path -LiteralPath $msbuild -PathType Leaf)) {
+            throw "MSBuild nao encontrado: $msbuild"
+          }
+          if (-not $inno) {
+            throw 'Inno Setup 6 nao encontrado.'
+          }
+          if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
+            throw 'GitHub CLI nao encontrado.'
+          }
+
+          Write-Host 'Delphi 12 Win64 encontrado.'
+          Write-Host 'MSBuild encontrado.'
+          Write-Host "Inno Setup encontrado: $inno"
+          Write-Host 'GitHub CLI encontrado.'

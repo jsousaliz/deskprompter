@@ -1,6 +1,7 @@
 # Saidas de compilacao do Delphi
 bin/
 dcu/
+dist/
 *.dcu
 *.exe
 *.map

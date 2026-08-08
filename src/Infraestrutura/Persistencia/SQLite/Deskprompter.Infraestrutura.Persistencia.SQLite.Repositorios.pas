@@ -104,7 +104,7 @@ begin
     Consulta.SQL.Text :=
       'INSERT INTO grupos (id, nome, ordem) VALUES (:id, :nome, :ordem)';
     Consulta.ParamByName('id').AsString := GuidTexto(AGrupo.Identificador);
-    Consulta.ParamByName('nome').AsString := AGrupo.Nome;
+    Consulta.ParamByName('nome').AsWideString := AGrupo.Nome;
     Consulta.ParamByName('ordem').AsInteger := AGrupo.Ordem;
     Consulta.ExecSQL;
   finally
@@ -122,7 +122,7 @@ begin
     Consulta.SQL.Text :=
       'UPDATE grupos SET nome = :nome, ordem = :ordem, ' +
       'atualizado_em = CURRENT_TIMESTAMP WHERE id = :id';
-    Consulta.ParamByName('nome').AsString := AGrupo.Nome;
+    Consulta.ParamByName('nome').AsWideString := AGrupo.Nome;
     Consulta.ParamByName('ordem').AsInteger := AGrupo.Ordem;
     Consulta.ParamByName('id').AsString := GuidTexto(AGrupo.Identificador);
     Consulta.ExecSQL;
@@ -160,7 +160,7 @@ begin
       begin
         Result.Add(TGrupo.Create(
           StringToGUID(Consulta.FieldByName('id').AsString),
-          Consulta.FieldByName('nome').AsString,
+          Consulta.FieldByName('nome').AsWideString,
           Consulta.FieldByName('ordem').AsInteger));
         Consulta.Next;
       end;
@@ -204,7 +204,7 @@ begin
       Consulta.Open;
       if not Consulta.Eof then
       begin
-        Result.NomeFonte := Consulta.FieldByName('nome_fonte').AsString;
+        Result.NomeFonte := Consulta.FieldByName('nome_fonte').AsWideString;
         Result.TamanhoFonte :=
           Consulta.FieldByName('tamanho_fonte').AsInteger;
         Result.CorFonte := Consulta.FieldByName('cor_fonte').AsInteger;
@@ -278,7 +278,8 @@ begin
         'espelho_horizontal = :espelho_horizontal, ' +
         'espelho_vertical = :espelho_vertical, ' +
         'atualizado_em = CURRENT_TIMESTAMP WHERE id = 1';
-      Consulta.ParamByName('nome_fonte').AsString := APreferencias.NomeFonte;
+      Consulta.ParamByName('nome_fonte').AsWideString :=
+        APreferencias.NomeFonte;
       Consulta.ParamByName('tamanho_fonte').AsInteger :=
         APreferencias.TamanhoFonte;
       Consulta.ParamByName('cor_fonte').AsInteger := APreferencias.CorFonte;
@@ -330,8 +331,8 @@ begin
     Consulta.ParamByName('id').AsString := GuidTexto(ATexto.Identificador);
     Consulta.ParamByName('grupo_id').AsString :=
       GuidTexto(ATexto.GrupoIdentificador);
-    Consulta.ParamByName('titulo').AsString := ATexto.Titulo;
-    Consulta.ParamByName('conteudo').AsString := ATexto.Conteudo;
+    Consulta.ParamByName('titulo').AsWideString := ATexto.Titulo;
+    Consulta.ParamByName('conteudo').AsWideString := ATexto.Conteudo;
     Consulta.ParamByName('ordem').AsInteger := ATexto.Ordem;
     Consulta.ExecSQL;
   finally
@@ -351,8 +352,8 @@ begin
       'ordem = :ordem, atualizado_em = CURRENT_TIMESTAMP WHERE id = :id';
     Consulta.ParamByName('grupo_id').AsString :=
       GuidTexto(ATexto.GrupoIdentificador);
-    Consulta.ParamByName('titulo').AsString := ATexto.Titulo;
-    Consulta.ParamByName('conteudo').AsString := ATexto.Conteudo;
+    Consulta.ParamByName('titulo').AsWideString := ATexto.Titulo;
+    Consulta.ParamByName('conteudo').AsWideString := ATexto.Conteudo;
     Consulta.ParamByName('ordem').AsInteger := ATexto.Ordem;
     Consulta.ParamByName('id').AsString := GuidTexto(ATexto.Identificador);
     Consulta.ExecSQL;
@@ -394,8 +395,8 @@ begin
         Result.Add(TTexto.Create(
           StringToGUID(Consulta.FieldByName('id').AsString),
           StringToGUID(Consulta.FieldByName('grupo_id').AsString),
-          Consulta.FieldByName('titulo').AsString,
-          Consulta.FieldByName('conteudo').AsString,
+          Consulta.FieldByName('titulo').AsWideString,
+          Consulta.FieldByName('conteudo').AsWideString,
           Consulta.FieldByName('ordem').AsInteger));
         Consulta.Next;
       end;

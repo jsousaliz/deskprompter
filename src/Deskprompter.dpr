@@ -1,6 +1,7 @@
 program Deskprompter;
 
 uses
+  System.SysUtils,
   Vcl.Forms,
   Deskprompter.Aplicacao.Aparencia.EstadoEspelhamento in 'Aplicacao\Aparencia\Deskprompter.Aplicacao.Aparencia.EstadoEspelhamento.pas',
   Deskprompter.Aplicacao.Comandos in 'Aplicacao\Comandos\Deskprompter.Aplicacao.Comandos.pas',
@@ -34,22 +35,30 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
 
-  RaizComposicao := TRaizComposicao.Create;
   try
-    RaizComposicao.RegistroDiagnostico.Registrar(
-      nrInformacao,
-      'Aplicacao Deskprompter iniciada');
+    RaizComposicao := TRaizComposicao.Create;
+    try
+      RaizComposicao.RegistroDiagnostico.Registrar(
+        nrInformacao,
+        'Aplicacao Deskprompter iniciada');
 
-    Application.CreateForm(TFormularioPrincipal, FormularioPrincipal);
-    FormularioPrincipal.Configurar(
-      RaizComposicao.RegistroDiagnostico,
-      RaizComposicao.Relogio,
-      RaizComposicao.ProtecaoCaptura,
-      RaizComposicao.RepositorioGrupos,
-      RaizComposicao.RepositorioTextos,
-      RaizComposicao.RepositorioPreferencias);
-    Application.Run;
-  finally
-    RaizComposicao.Free;
+      Application.CreateForm(TFormularioPrincipal, FormularioPrincipal);
+      FormularioPrincipal.Configurar(
+        RaizComposicao.RegistroDiagnostico,
+        RaizComposicao.Relogio,
+        RaizComposicao.ProtecaoCaptura,
+        RaizComposicao.RepositorioGrupos,
+        RaizComposicao.RepositorioTextos,
+        RaizComposicao.RepositorioPreferencias);
+      Application.Run;
+    finally
+      RaizComposicao.Free;
+    end;
+  except
+    on E: Exception do
+    begin
+      Application.ShowException(E);
+      System.ExitCode := 1;
+    end;
   end;
 end.

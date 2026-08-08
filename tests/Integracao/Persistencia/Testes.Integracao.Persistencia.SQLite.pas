@@ -39,6 +39,10 @@ type
 
     [Test]
     procedure PersistirPreferenciasEAtalhos;
+    [Test]
+    procedure PersistirUnicodeETextoLongo;
+    [Test]
+    procedure MigrarVersaoUmSemPerderConteudo;
   end;
 
 implementation
@@ -209,6 +213,120 @@ begin
   finally
     GrupoDestino.Free;
     GrupoOrigem.Free;
+  end;
+end;
+
+procedure TTestesPersistenciaSQLite.MigrarVersaoUmSemPerderConteudo;
+var
+  Grupo: TGrupo;
+  Grupos: TObjectList<TGrupo>;
+  Texto: TTexto;
+  Textos: TObjectList<TTexto>;
+begin
+  Grupo := TGrupo.Novo('Grupo legado');
+  try
+    FRepositorioGrupos.Adicionar(Grupo);
+    Texto := TTexto.Novo(Grupo.Identificador, 'Texto legado');
+    try
+      Texto.AlterarConteudo('Conteudo anterior a migracao');
+      FRepositorioTextos.Adicionar(Texto);
+    finally
+      Texto.Free;
+    end;
+  finally
+    Grupo.Free;
+  end;
+
+  FRepositorioPreferencias := nil;
+  FRepositorioTextos := nil;
+  FRepositorioGrupos := nil;
+  FBancoDados.Conexao.ExecSQL('DROP TABLE atalhos');
+  FBancoDados.Conexao.ExecSQL('DROP TABLE preferencias');
+  FBancoDados.Conexao.ExecSQL(
+    'DELETE FROM versoes_esquema WHERE versao = 2');
+  FreeAndNil(FBancoDados);
+
+  FBancoDados := TBancoDadosSQLite.Create(FCaminhoBanco);
+  FRepositorioGrupos := TRepositorioGruposSQLite.Create(FBancoDados.Conexao);
+  FRepositorioPreferencias :=
+    TRepositorioPreferenciasSQLite.Create(FBancoDados.Conexao);
+  FRepositorioTextos := TRepositorioTextosSQLite.Create(FBancoDados.Conexao);
+
+  Assert.AreEqual(
+    2,
+    Integer(FBancoDados.Conexao.ExecSQLScalar(
+      'SELECT MAX(versao) FROM versoes_esquema')));
+  Grupos := FRepositorioGrupos.Listar;
+  try
+    Assert.AreEqual(1, Integer(Grupos.Count));
+    Assert.AreEqual('Grupo legado', Grupos[0].Nome);
+    Textos := FRepositorioTextos.ListarDoGrupo(Grupos[0].Identificador);
+    try
+      Assert.AreEqual(1, Integer(Textos.Count));
+      Assert.AreEqual('Texto legado', Textos[0].Titulo);
+      Assert.AreEqual(
+        'Conteudo anterior a migracao',
+        Textos[0].Conteudo);
+    finally
+      Textos.Free;
+    end;
+  finally
+    Grupos.Free;
+  end;
+end;
+
+procedure TTestesPersistenciaSQLite.PersistirUnicodeETextoLongo;
+var
+  ConteudoEsperado: string;
+  Grupo: TGrupo;
+  Indice: Integer;
+  NomeGrupo: string;
+  Texto: TTexto;
+  Textos: TObjectList<TTexto>;
+  TituloTexto: string;
+  UnicodeEsperado: string;
+begin
+  NomeGrupo := 'Apresenta' + Char($00E7) + Char($00E3) + 'o';
+  TituloTexto := 'Revis' + Char($00E3) + 'o ' + Char($65E5) + Char($672C);
+  UnicodeEsperado :=
+    'Portugu' + Char($00EA) + 's | ' +
+    Char($65E5) + Char($672C) + Char($8A9E) + ' | ' +
+    Char($0639) + Char($0631) + Char($0628) + Char($064A) + ' | ' +
+    Char($D83D) + Char($DE00);
+  ConteudoEsperado :=
+    UnicodeEsperado + sLineBreak + StringOfChar(Char($00E1), 120000);
+
+  Grupo := TGrupo.Novo(NomeGrupo);
+  try
+    FRepositorioGrupos.Adicionar(Grupo);
+    Texto := TTexto.Novo(Grupo.Identificador, TituloTexto);
+    try
+      Texto.AlterarConteudo(ConteudoEsperado);
+      FRepositorioTextos.Adicionar(Texto);
+    finally
+      Texto.Free;
+    end;
+
+    Textos := FRepositorioTextos.ListarDoGrupo(Grupo.Identificador);
+    try
+      Assert.AreEqual(1, Integer(Textos.Count));
+      Assert.AreEqual(Length(TituloTexto), Length(Textos[0].Titulo));
+      for Indice := 1 to Length(TituloTexto) do
+        Assert.AreEqual(
+          Ord(TituloTexto[Indice]),
+          Ord(Textos[0].Titulo[Indice]),
+          Format('Titulo divergente no caractere %d', [Indice]));
+      Assert.AreEqual(Length(ConteudoEsperado), Length(Textos[0].Conteudo));
+      for Indice := 1 to Length(ConteudoEsperado) do
+        Assert.AreEqual(
+          Ord(ConteudoEsperado[Indice]),
+          Ord(Textos[0].Conteudo[Indice]),
+          Format('Conteudo divergente no caractere %d', [Indice]));
+    finally
+      Textos.Free;
+    end;
+  finally
+    Grupo.Free;
   end;
 end;
 
