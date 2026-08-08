@@ -4,13 +4,9 @@
 
 <h1 align="center">Deskprompter</h1>
 
-<p align="center">
-  Teleprompter para Windows com organização de textos, rolagem automática,
-  espelhamento e proteção contra captura de tela.
-</p>
+Teleprompter para Windows com organização de textos, rolagem automática, espelhamento e proteção contra captura de tela.
 
-> O Deskprompter está em desenvolvimento. Recursos e formatos de persistência
-> ainda podem mudar.
+
 
 ## Recursos
 
