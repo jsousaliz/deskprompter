@@ -1,0 +1,30 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{5ACF70FD-1A38-4BD6-BC8B-E4E71818B548}</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup>
+    <Projects Include="src\Deskprompter.dproj">
+      <Dependencies />
+    </Projects>
+    <Projects Include="tests\Deskprompter.Testes.dproj">
+      <Dependencies />
+    </Projects>
+  </ItemGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Default.Personality.12</Borland.Personality>
+    <Borland.ProjectType />
+    <BorlandProject>
+      <Default.Personality />
+    </BorlandProject>
+  </ProjectExtensions>
+  <Target Name="Deskprompter">
+    <MSBuild Projects="src\Deskprompter.dproj" />
+  </Target>
+  <Target Name="Deskprompter_Testes">
+    <MSBuild Projects="tests\Deskprompter.Testes.dproj" />
+  </Target>
+  <Target Name="Build">
+    <CallTarget Targets="Deskprompter;Deskprompter_Testes" />
+  </Target>
+  <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')" />
+</Project>

@@ -1,0 +1,134 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{968CC288-12A5-4B49-A38F-1992C10B4B22}</ProjectGuid>
+    <ProjectVersion>20.2</ProjectVersion>
+    <FrameworkType>VCL</FrameworkType>
+    <MainSource>Deskprompter.dpr</MainSource>
+    <Base>True</Base>
+    <Config Condition="'$(Config)'==''">Debug</Config>
+    <Platform Condition="'$(Platform)'==''">Win64</Platform>
+    <ProjectName Condition="'$(ProjectName)'==''">Deskprompter</ProjectName>
+    <AppType>Application</AppType>
+    <TargetedPlatforms>3</TargetedPlatforms>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+    <Base>true</Base>
+  </PropertyGroup>
+  <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
+    <Base_Win64>true</Base_Win64>
+    <CfgParent>Base</CfgParent>
+    <Base>true</Base>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
+    <Cfg_1>true</Cfg_1>
+    <CfgParent>Base</CfgParent>
+    <Base>true</Base>
+  </PropertyGroup>
+  <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win64)'!=''">
+    <Cfg_1_Win64>true</Cfg_1_Win64>
+    <CfgParent>Cfg_1</CfgParent>
+    <Cfg_1>true</Cfg_1>
+    <Base>true</Base>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
+    <Cfg_2>true</Cfg_2>
+    <CfgParent>Base</CfgParent>
+    <Base>true</Base>
+  </PropertyGroup>
+  <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win64)'!=''">
+    <Cfg_2_Win64>true</Cfg_2_Win64>
+    <CfgParent>Cfg_2</CfgParent>
+    <Cfg_2>true</Cfg_2>
+    <Base>true</Base>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Base)'!=''">
+    <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Winapi;Vcl;$(DCC_Namespace)</DCC_Namespace>
+    <DCC_UnitSearchPath>Dominio;Aplicacao\Aparencia;Aplicacao\Comandos;Aplicacao\Contratos;Aplicacao\Preferencias;Aplicacao\Rolagem;Infraestrutura\Diagnostico;Infraestrutura\Persistencia\SQLite;Infraestrutura\Tempo;Infraestrutura\Windows;Inicializacao;VCL;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+    <DCC_ExeOutput>..\bin\app</DCC_ExeOutput>
+    <DCC_DcuOutput>..\dcu\app\$(Config)</DCC_DcuOutput>
+    <DCC_DependencyCheckOutputName>Deskprompter.exe</DCC_DependencyCheckOutputName>
+    <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Cfg_2)'!=''">
+    <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+    <DCC_DebugInformation>2</DCC_DebugInformation>
+    <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+    <DCC_LocalDebugSymbols>true</DCC_LocalDebugSymbols>
+    <DCC_Optimize>false</DCC_Optimize>
+    <DCC_SymbolReferenceInfo>2</DCC_SymbolReferenceInfo>
+    <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Cfg_1)'!=''">
+    <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+    <DCC_DebugInformation>0</DCC_DebugInformation>
+    <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+    <DCC_Optimize>true</DCC_Optimize>
+    <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+  </PropertyGroup>
+  <ItemGroup>
+    <DelphiCompile Include="$(MainSource)">
+      <MainSource>MainSource</MainSource>
+    </DelphiCompile>
+    <DCCReference Include="Dominio\Deskprompter.Dominio.Grupos.pas" />
+    <DCCReference Include="Dominio\Deskprompter.Dominio.Textos.pas" />
+    <DCCReference Include="Aplicacao\Aparencia\Deskprompter.Aplicacao.Aparencia.EstadoEspelhamento.pas" />
+    <DCCReference Include="Aplicacao\Comandos\Deskprompter.Aplicacao.Comandos.pas" />
+    <DCCReference Include="Aplicacao\Preferencias\Deskprompter.Aplicacao.Preferencias.pas" />
+    <DCCReference Include="Aplicacao\Contratos\Deskprompter.Aplicacao.Contratos.Diagnostico.pas" />
+    <DCCReference Include="Aplicacao\Contratos\Deskprompter.Aplicacao.Contratos.ProtecaoCaptura.pas" />
+    <DCCReference Include="Aplicacao\Contratos\Deskprompter.Aplicacao.Contratos.Repositorios.pas" />
+    <DCCReference Include="Aplicacao\Contratos\Deskprompter.Aplicacao.Contratos.Tempo.pas" />
+    <DCCReference Include="Aplicacao\Rolagem\Deskprompter.Aplicacao.Rolagem.Motor.pas" />
+    <DCCReference Include="Infraestrutura\Diagnostico\Deskprompter.Infraestrutura.Diagnostico.Depurador.pas" />
+    <DCCReference Include="Infraestrutura\Persistencia\SQLite\Deskprompter.Infraestrutura.Persistencia.SQLite.Banco.pas" />
+    <DCCReference Include="Infraestrutura\Persistencia\SQLite\Deskprompter.Infraestrutura.Persistencia.SQLite.Repositorios.pas" />
+    <DCCReference Include="Infraestrutura\Tempo\Deskprompter.Infraestrutura.Tempo.RelogioSistema.pas" />
+    <DCCReference Include="Infraestrutura\Windows\Deskprompter.Infraestrutura.Windows.ProtecaoCaptura.pas" />
+    <DCCReference Include="Inicializacao\Deskprompter.Inicializacao.RaizComposicao.pas" />
+    <DCCReference Include="VCL\Deskprompter.VCL.ControladorAparencia.pas" />
+    <DCCReference Include="VCL\Deskprompter.VCL.ControladorBiblioteca.pas" />
+    <DCCReference Include="VCL\Deskprompter.VCL.ControladorComandos.pas" />
+    <DCCReference Include="VCL\Deskprompter.VCL.ControladorProtecaoCaptura.pas" />
+    <DCCReference Include="VCL\Deskprompter.VCL.ControladorRolagem.pas" />
+    <DCCReference Include="VCL\Deskprompter.VCL.FormularioAtalhos.pas">
+      <Form>FormularioAtalhos</Form>
+    </DCCReference>
+    <DCCReference Include="VCL\Deskprompter.VCL.Icones.pas"/>
+    <DCCReference Include="VCL\Deskprompter.VCL.FormularioPrincipal.pas">
+      <Form>FormularioPrincipal</Form>
+    </DCCReference>
+    <BuildConfiguration Include="Debug">
+      <Key>Cfg_2</Key>
+      <CfgParent>Base</CfgParent>
+    </BuildConfiguration>
+    <BuildConfiguration Include="Release">
+      <Key>Cfg_1</Key>
+      <CfgParent>Base</CfgParent>
+    </BuildConfiguration>
+    <BuildConfiguration Include="Base">
+      <Key>Base</Key>
+    </BuildConfiguration>
+  </ItemGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Delphi.Personality.12</Borland.Personality>
+    <Borland.ProjectType>VCLApplication</Borland.ProjectType>
+    <BorlandProject>
+      <Delphi.Personality>
+        <Source>
+          <Source Name="MainSource">Deskprompter.dpr</Source>
+        </Source>
+        <Parameters>
+          <Parameters Name="UseLauncher">False</Parameters>
+          <Parameters Name="LoadAllSymbols">True</Parameters>
+          <Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
+        </Parameters>
+      </Delphi.Personality>
+      <Platforms>
+        <Platform value="Win32">False</Platform>
+        <Platform value="Win64">True</Platform>
+      </Platforms>
+    </BorlandProject>
+    <ProjectFileVersion>12</ProjectFileVersion>
+  </ProjectExtensions>
+  <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')" />
+</Project>

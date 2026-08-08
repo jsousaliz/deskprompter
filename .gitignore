@@ -1,0 +1,20 @@
+# Saidas de compilacao do Delphi
+bin/
+dcu/
+*.dcu
+*.exe
+*.map
+*.local
+*.identcache
+*.stat
+*.dsk
+*.skincfg
+
+# Recursos gerados pelo MSBuild para os projetos atuais
+/src/Deskprompter.res
+/tests/Deskprompter.Testes.res
+
+# Arquivos locais da IDE
+__history/
+*.projdata
+/docs
