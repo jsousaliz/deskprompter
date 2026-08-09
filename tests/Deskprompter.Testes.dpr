@@ -12,6 +12,7 @@ uses
   Deskprompter.Aplicacao.Comandos in '..\src\Aplicacao\Comandos\Deskprompter.Aplicacao.Comandos.pas',
   Deskprompter.Aplicacao.Preferencias in '..\src\Aplicacao\Preferencias\Deskprompter.Aplicacao.Preferencias.pas',
   Deskprompter.Aplicacao.Contratos.Diagnostico in '..\src\Aplicacao\Contratos\Deskprompter.Aplicacao.Contratos.Diagnostico.pas',
+  Deskprompter.Aplicacao.Contratos.PosicionamentoJanela in '..\src\Aplicacao\Contratos\Deskprompter.Aplicacao.Contratos.PosicionamentoJanela.pas',
   Deskprompter.Aplicacao.Contratos.ProtecaoCaptura in '..\src\Aplicacao\Contratos\Deskprompter.Aplicacao.Contratos.ProtecaoCaptura.pas',
   Deskprompter.Aplicacao.Contratos.Repositorios in '..\src\Aplicacao\Contratos\Deskprompter.Aplicacao.Contratos.Repositorios.pas',
   Deskprompter.Aplicacao.Rolagem.Motor in '..\src\Aplicacao\Rolagem\Deskprompter.Aplicacao.Rolagem.Motor.pas',
@@ -20,6 +21,7 @@ uses
   Deskprompter.VCL.ControladorAparencia in '..\src\VCL\Deskprompter.VCL.ControladorAparencia.pas',
   Deskprompter.VCL.ControladorComandos in '..\src\VCL\Deskprompter.VCL.ControladorComandos.pas',
   Deskprompter.VCL.ControladorProtecaoCaptura in '..\src\VCL\Deskprompter.VCL.ControladorProtecaoCaptura.pas',
+  Deskprompter.VCL.ControladorSempreNoTopo in '..\src\VCL\Deskprompter.VCL.ControladorSempreNoTopo.pas',
   Deskprompter.VCL.FormularioAtalhos in '..\src\VCL\Deskprompter.VCL.FormularioAtalhos.pas' {FormularioAtalhos},
   Testes.Dominio.Grupos in 'Unitarios\Dominio\Testes.Dominio.Grupos.pas',
   Testes.Dominio.Textos in 'Unitarios\Dominio\Testes.Dominio.Textos.pas',
@@ -29,6 +31,7 @@ uses
   Testes.VCL.ControladorAparencia in 'Unitarios\VCL\Testes.VCL.ControladorAparencia.pas',
   Testes.VCL.FormularioAtalhos in 'Unitarios\VCL\Testes.VCL.FormularioAtalhos.pas',
   Testes.VCL.ControladorProtecaoCaptura in 'Unitarios\VCL\Testes.VCL.ControladorProtecaoCaptura.pas',
+  Testes.VCL.ControladorSempreNoTopo in 'Unitarios\VCL\Testes.VCL.ControladorSempreNoTopo.pas',
   Testes.Integracao.Persistencia.SQLite in 'Integracao\Persistencia\Testes.Integracao.Persistencia.SQLite.pas';
 
 var

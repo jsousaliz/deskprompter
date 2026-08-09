@@ -22,6 +22,8 @@ Teleprompter para Windows com organização de textos, rolagem automática, espe
 - Modo de tela cheia e opção de ocultar os painéis para exibir somente o texto.
 - Atalhos de teclado predefinidos, editáveis e persistidos localmente.
 - Proteção de captura que pode ser ativada ou desativada durante a execução.
+- Modo sempre no topo para manter o roteiro visível ao trabalhar em outra
+  janela.
 
 ## Proteção contra captura
 

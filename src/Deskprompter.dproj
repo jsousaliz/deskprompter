@@ -83,6 +83,7 @@
     <DCCReference Include="Aplicacao\Comandos\Deskprompter.Aplicacao.Comandos.pas" />
     <DCCReference Include="Aplicacao\Preferencias\Deskprompter.Aplicacao.Preferencias.pas" />
     <DCCReference Include="Aplicacao\Contratos\Deskprompter.Aplicacao.Contratos.Diagnostico.pas" />
+    <DCCReference Include="Aplicacao\Contratos\Deskprompter.Aplicacao.Contratos.PosicionamentoJanela.pas" />
     <DCCReference Include="Aplicacao\Contratos\Deskprompter.Aplicacao.Contratos.ProtecaoCaptura.pas" />
     <DCCReference Include="Aplicacao\Contratos\Deskprompter.Aplicacao.Contratos.Repositorios.pas" />
     <DCCReference Include="Aplicacao\Contratos\Deskprompter.Aplicacao.Contratos.Tempo.pas" />
@@ -91,6 +92,7 @@
     <DCCReference Include="Infraestrutura\Persistencia\SQLite\Deskprompter.Infraestrutura.Persistencia.SQLite.Banco.pas" />
     <DCCReference Include="Infraestrutura\Persistencia\SQLite\Deskprompter.Infraestrutura.Persistencia.SQLite.Repositorios.pas" />
     <DCCReference Include="Infraestrutura\Tempo\Deskprompter.Infraestrutura.Tempo.RelogioSistema.pas" />
+    <DCCReference Include="Infraestrutura\Windows\Deskprompter.Infraestrutura.Windows.PosicionamentoJanela.pas" />
     <DCCReference Include="Infraestrutura\Windows\Deskprompter.Infraestrutura.Windows.ProtecaoCaptura.pas" />
     <DCCReference Include="Inicializacao\Deskprompter.Inicializacao.RaizComposicao.pas" />
     <DCCReference Include="VCL\Deskprompter.VCL.ControladorAparencia.pas" />
@@ -98,6 +100,7 @@
     <DCCReference Include="VCL\Deskprompter.VCL.ControladorComandos.pas" />
     <DCCReference Include="VCL\Deskprompter.VCL.ControladorProtecaoCaptura.pas" />
     <DCCReference Include="VCL\Deskprompter.VCL.ControladorRolagem.pas" />
+    <DCCReference Include="VCL\Deskprompter.VCL.ControladorSempreNoTopo.pas" />
     <DCCReference Include="VCL\Deskprompter.VCL.FormularioAtalhos.pas">
       <Form>FormularioAtalhos</Form>
     </DCCReference>

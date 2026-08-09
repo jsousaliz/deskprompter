@@ -4,6 +4,7 @@ interface
 
 uses
   Deskprompter.Aplicacao.Contratos.Diagnostico,
+  Deskprompter.Aplicacao.Contratos.PosicionamentoJanela,
   Deskprompter.Aplicacao.Contratos.ProtecaoCaptura,
   Deskprompter.Aplicacao.Contratos.Repositorios,
   Deskprompter.Aplicacao.Contratos.Tempo;
@@ -13,6 +14,7 @@ type
   private
     FRegistroDiagnostico: IRegistroDiagnostico;
     FRelogio: IRelogio;
+    FPosicionamentoJanela: IPosicionamentoJanela;
     FProtecaoCaptura: IProtecaoCaptura;
     FRepositorioGrupos: IRepositorioGrupos;
     FRepositorioPreferencias: IRepositorioPreferencias;
@@ -25,6 +27,8 @@ type
     property RegistroDiagnostico: IRegistroDiagnostico
       read FRegistroDiagnostico;
     property Relogio: IRelogio read FRelogio;
+    property PosicionamentoJanela: IPosicionamentoJanela
+      read FPosicionamentoJanela;
     property ProtecaoCaptura: IProtecaoCaptura read FProtecaoCaptura;
     property RepositorioGrupos: IRepositorioGrupos read FRepositorioGrupos;
     property RepositorioPreferencias: IRepositorioPreferencias
@@ -41,6 +45,7 @@ uses
   Deskprompter.Infraestrutura.Persistencia.SQLite.Banco,
   Deskprompter.Infraestrutura.Persistencia.SQLite.Repositorios,
   Deskprompter.Infraestrutura.Tempo.RelogioSistema,
+  Deskprompter.Infraestrutura.Windows.PosicionamentoJanela,
   Deskprompter.Infraestrutura.Windows.ProtecaoCaptura;
 
 constructor TRaizComposicao.Create;
@@ -51,6 +56,7 @@ begin
   inherited Create;
   FRegistroDiagnostico := TRegistroDiagnosticoDepurador.Create;
   FRelogio := TRelogioSistema.Create;
+  FPosicionamentoJanela := TPosicionamentoJanelaWindows.Create;
   FProtecaoCaptura := TProtecaoCapturaWindows.Create;
 
   DiretorioDados := GetEnvironmentVariable('LOCALAPPDATA');
@@ -73,6 +79,7 @@ begin
   FRepositorioPreferencias := nil;
   FRepositorioGrupos := nil;
   FBancoDados.Free;
+  FPosicionamentoJanela := nil;
   inherited;
 end;
 

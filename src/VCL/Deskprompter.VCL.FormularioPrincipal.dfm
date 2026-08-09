@@ -13,7 +13,6 @@ object FormularioPrincipal: TFormularioPrincipal
   Font.Style = []
   KeyPreview = True
   Position = poScreenCenter
-  WindowState = wsMaximized
   OnCloseQuery = FormularioCloseQuery
   OnCreate = FormularioCreate
   OnDestroy = FormularioDestroy
@@ -243,13 +242,13 @@ object FormularioPrincipal: TFormularioPrincipal
       AlignWithMargins = True
       Left = 62
       Top = 9
-      Width = 978
+      Width = 180
       Height = 21
       Margins.Left = 4
       Margins.Top = 8
       Margins.Right = 8
       Margins.Bottom = 4
-      Align = alClient
+      Align = alLeft
       AutoSize = False
       Caption = 'Protecao de captura ativa'
       Font.Charset = DEFAULT_CHARSET
@@ -258,9 +257,27 @@ object FormularioPrincipal: TFormularioPrincipal
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitTop = 8
-      ExplicitWidth = 649
-      ExplicitHeight = 22
+    end
+    object RotuloSempreNoTopo: TLabel
+      AlignWithMargins = True
+      Left = 312
+      Top = 9
+      Width = 180
+      Height = 21
+      Margins.Left = 4
+      Margins.Top = 8
+      Margins.Right = 8
+      Margins.Bottom = 4
+      Align = alLeft
+      AutoSize = False
+      Caption = 'Sempre no topo ativo'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = 6878097
+      Font.Height = -12
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+      ExplicitLeft = 351
     end
     object RotuloSalvamento: TLabel
       AlignWithMargins = True
@@ -313,6 +330,23 @@ object FormularioPrincipal: TFormularioPrincipal
       TabOrder = 0
       OnClick = ChaveProtecaoCapturaClick
       ExplicitHeight = 20
+    end
+    object ChaveSempreNoTopo: TToggleSwitch
+      AlignWithMargins = True
+      Left = 254
+      Top = 7
+      Width = 50
+      Height = 21
+      Margins.Left = 4
+      Margins.Top = 6
+      Margins.Right = 4
+      Margins.Bottom = 6
+      Align = alLeft
+      ShowStateCaption = False
+      State = tssOn
+      TabOrder = 2
+      OnClick = ChaveSempreNoTopoClick
+      ExplicitLeft = 200
     end
   end
   object PanelTextos: TPanel

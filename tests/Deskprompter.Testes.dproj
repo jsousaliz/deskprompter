@@ -71,6 +71,7 @@
         <DCCReference Include="..\src\Aplicacao\Comandos\Deskprompter.Aplicacao.Comandos.pas"/>
         <DCCReference Include="..\src\Aplicacao\Preferencias\Deskprompter.Aplicacao.Preferencias.pas"/>
         <DCCReference Include="..\src\Aplicacao\Contratos\Deskprompter.Aplicacao.Contratos.Diagnostico.pas"/>
+        <DCCReference Include="..\src\Aplicacao\Contratos\Deskprompter.Aplicacao.Contratos.PosicionamentoJanela.pas"/>
         <DCCReference Include="..\src\Aplicacao\Contratos\Deskprompter.Aplicacao.Contratos.ProtecaoCaptura.pas"/>
         <DCCReference Include="..\src\Aplicacao\Contratos\Deskprompter.Aplicacao.Contratos.Repositorios.pas"/>
         <DCCReference Include="..\src\Aplicacao\Rolagem\Deskprompter.Aplicacao.Rolagem.Motor.pas"/>
@@ -79,6 +80,7 @@
         <DCCReference Include="..\src\VCL\Deskprompter.VCL.ControladorAparencia.pas"/>
         <DCCReference Include="..\src\VCL\Deskprompter.VCL.ControladorComandos.pas"/>
         <DCCReference Include="..\src\VCL\Deskprompter.VCL.ControladorProtecaoCaptura.pas"/>
+        <DCCReference Include="..\src\VCL\Deskprompter.VCL.ControladorSempreNoTopo.pas"/>
         <DCCReference Include="..\src\VCL\Deskprompter.VCL.FormularioAtalhos.pas">
             <Form>FormularioAtalhos</Form>
         </DCCReference>
@@ -90,6 +92,7 @@
         <DCCReference Include="Unitarios\VCL\Testes.VCL.ControladorAparencia.pas"/>
         <DCCReference Include="Unitarios\VCL\Testes.VCL.FormularioAtalhos.pas"/>
         <DCCReference Include="Unitarios\VCL\Testes.VCL.ControladorProtecaoCaptura.pas"/>
+        <DCCReference Include="Unitarios\VCL\Testes.VCL.ControladorSempreNoTopo.pas"/>
         <DCCReference Include="Integracao\Persistencia\Testes.Integracao.Persistencia.SQLite.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

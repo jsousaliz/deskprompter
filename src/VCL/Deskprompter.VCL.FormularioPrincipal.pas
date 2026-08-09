@@ -17,6 +17,7 @@ uses
   Vcl.WinXCtrls,
   Deskprompter.Aplicacao.Comandos,
   Deskprompter.Aplicacao.Contratos.Diagnostico,
+  Deskprompter.Aplicacao.Contratos.PosicionamentoJanela,
   Deskprompter.Aplicacao.Contratos.ProtecaoCaptura,
   Deskprompter.Aplicacao.Contratos.Repositorios,
   Deskprompter.Aplicacao.Contratos.Tempo,
@@ -26,6 +27,7 @@ uses
   Deskprompter.VCL.ControladorComandos,
   Deskprompter.VCL.ControladorProtecaoCaptura,
   Deskprompter.VCL.ControladorRolagem,
+  Deskprompter.VCL.ControladorSempreNoTopo,
   Deskprompter.VCL.FormularioAtalhos,
   Deskprompter.Dominio.Textos;
 
@@ -34,6 +36,7 @@ type
     ArvoreConteudo: TTreeView;
     BarraEstado: TPanel;
     ChaveProtecaoCaptura: TToggleSwitch;
+    ChaveSempreNoTopo: TToggleSwitch;
     BotaoBaixo: TSpeedButton;
     BotaoExcluir: TSpeedButton;
     BotaoNovoGrupo: TSpeedButton;
@@ -49,6 +52,7 @@ type
     LinhaDivisoriaEstado: TPanel;
     RotuloArvore: TLabel;
     RotuloEstadoCaptura: TLabel;
+    RotuloSempreNoTopo: TLabel;
     RotuloSalvamento: TLabel;
     TemporizadorRolagem: TTimer;
     TemporizadorSalvamento: TTimer;
@@ -135,6 +139,7 @@ type
     procedure BotaoTextoAnteriorClick(Sender: TObject);
     procedure BotaoProximoTextoClick(Sender: TObject);
     procedure ChaveProtecaoCapturaClick(Sender: TObject);
+    procedure ChaveSempreNoTopoClick(Sender: TObject);
     procedure DesenhoEspelhoMouseDown(Sender: TObject;
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure DesenhoEspelhoPaint(Sender: TObject);
@@ -161,6 +166,7 @@ type
     FControladorComandos: TControladorComandos;
     FControladorProtecaoCaptura: TControladorProtecaoCaptura;
     FControladorRolagem: TControladorRolagem;
+    FControladorSempreNoTopo: TControladorSempreNoTopo;
     FEstadoJanelaAnterior: TWindowState;
     FEstiloBordaAnterior: TFormBorderStyle;
     FLimitesAnteriores: TRect;
@@ -192,6 +198,7 @@ type
     procedure NotificarAlteracaoAparencia(
       const ARecalcularRolagem: Boolean = False);
     procedure ReaplicarProtecaoCaptura;
+    procedure ReaplicarSempreNoTopo;
     procedure RolagemAlterada(Sender: TObject);
     procedure SalvarAlteracoesPendentes;
     procedure SalvarPreferencias;
@@ -203,6 +210,7 @@ type
     procedure Configurar(
       const ARegistroDiagnostico: IRegistroDiagnostico;
       const ARelogio: IRelogio;
+      const APosicionamentoJanela: IPosicionamentoJanela;
       const AProtecaoCaptura: IProtecaoCaptura;
       const ARepositorioGrupos: IRepositorioGrupos;
       const ARepositorioTextos: IRepositorioTextos;
@@ -610,9 +618,17 @@ begin
     NativeUInt(Handle));
 end;
 
+procedure TFormularioPrincipal.ChaveSempreNoTopoClick(Sender: TObject);
+begin
+  FControladorSempreNoTopo.DefinirAtivo(
+    ChaveSempreNoTopo.State = tssOn,
+    NativeUInt(Handle));
+end;
+
 procedure TFormularioPrincipal.Configurar(
   const ARegistroDiagnostico: IRegistroDiagnostico;
   const ARelogio: IRelogio;
+  const APosicionamentoJanela: IPosicionamentoJanela;
   const AProtecaoCaptura: IProtecaoCaptura;
   const ARepositorioGrupos: IRepositorioGrupos;
   const ARepositorioTextos: IRepositorioTextos;
@@ -623,6 +639,9 @@ begin
   FControladorProtecaoCaptura.Configurar(
     ARegistroDiagnostico,
     AProtecaoCaptura);
+  FControladorSempreNoTopo.Configurar(
+    ARegistroDiagnostico,
+    APosicionamentoJanela);
   FRepositorioPreferencias := ARepositorioPreferencias;
   FPreferencias := FRepositorioPreferencias.Carregar;
   FControladorComandos := TControladorComandos.Create(
@@ -634,6 +653,7 @@ begin
     ARepositorioTextos);
   FControladorBiblioteca.Carregar(TGUID.Empty);
   ReaplicarProtecaoCaptura;
+  ReaplicarSempreNoTopo;
   FRegistroDiagnostico.Registrar(
     nrInformacao,
     'Biblioteca e preferencias locais carregadas');
@@ -643,6 +663,7 @@ procedure TFormularioPrincipal.CreateWnd;
 begin
   inherited;
   ReaplicarProtecaoCaptura;
+  ReaplicarSempreNoTopo;
 end;
 
 procedure TFormularioPrincipal.DefinirTelaCheia(const AAtivar: Boolean);
@@ -678,6 +699,7 @@ begin
     BotaoTelaCheia.ImageIndex := Ord(iibTelaCheia);
   end;
   ReaplicarProtecaoCaptura;
+  ReaplicarSempreNoTopo;
 end;
 
 procedure TFormularioPrincipal.DefinirVisibilidadeOpcoes(
@@ -687,6 +709,7 @@ begin
   if AVisiveis then
   begin
     PainelArvore.Visible := True;
+    Divisor.Left := PainelArvore.Left + PainelArvore.Width;
     Divisor.Visible := True;
     PainelControles.Visible := True;
     BarraEstado.Visible := True;
@@ -697,8 +720,8 @@ begin
   else
   begin
     BotaoOcultarOpcoes.Visible := False;
-    PainelArvore.Visible := False;
     Divisor.Visible := False;
+    PainelArvore.Visible := False;
     PainelControles.Visible := False;
     BarraEstado.Visible := False;
     PainelMostrarOpcoes.Height := 50;
@@ -857,6 +880,8 @@ begin
     RolagemAlterada);
   FControladorProtecaoCaptura := TControladorProtecaoCaptura.Create(
     RotuloEstadoCaptura);
+  FControladorSempreNoTopo := TControladorSempreNoTopo.Create(
+    RotuloSempreNoTopo);
 end;
 
 procedure TFormularioPrincipal.CarregarFontesDisponiveis;
@@ -888,6 +913,7 @@ begin
   TemporizadorAvisoEspelhamento.Enabled := False;
   FControladorComandos.Free;
   FPreferencias.Free;
+  FControladorSempreNoTopo.Free;
   FControladorProtecaoCaptura.Free;
   FControladorRolagem.Free;
   FControladorAparencia.Free;
@@ -936,6 +962,12 @@ procedure TFormularioPrincipal.ReaplicarProtecaoCaptura;
 begin
   if Assigned(FControladorProtecaoCaptura) and HandleAllocated then
     FControladorProtecaoCaptura.Aplicar(NativeUInt(Handle));
+end;
+
+procedure TFormularioPrincipal.ReaplicarSempreNoTopo;
+begin
+  if Assigned(FControladorSempreNoTopo) and HandleAllocated then
+    FControladorSempreNoTopo.Aplicar(NativeUInt(Handle));
 end;
 
 procedure TFormularioPrincipal.SalvarPreferencias;
