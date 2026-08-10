@@ -201,7 +201,9 @@ begin
         'SELECT nome_fonte, tamanho_fonte, cor_fonte, cor_fundo, ' +
         'opacidade, margem, velocidade, espelho_horizontal, ' +
         'espelho_vertical, protecao_captura, sempre_no_topo, ' +
-        'ocultar_icone_barra_tarefas FROM preferencias WHERE id = 1';
+        'ocultar_icone_barra_tarefas, posicao_janela_salva, ' +
+        'janela_esquerda, janela_topo, janela_largura, janela_altura, ' +
+        'janela_maximizada FROM preferencias WHERE id = 1';
       Consulta.Open;
       if not Consulta.Eof then
       begin
@@ -223,6 +225,17 @@ begin
           Consulta.FieldByName('sempre_no_topo').AsInteger <> 0;
         Result.OcultarIconeBarraTarefas :=
           Consulta.FieldByName('ocultar_icone_barra_tarefas').AsInteger <> 0;
+        Result.PosicaoJanelaSalva :=
+          Consulta.FieldByName('posicao_janela_salva').AsInteger <> 0;
+        Result.JanelaEsquerda :=
+          Consulta.FieldByName('janela_esquerda').AsInteger;
+        Result.JanelaTopo := Consulta.FieldByName('janela_topo').AsInteger;
+        Result.JanelaLargura :=
+          Consulta.FieldByName('janela_largura').AsInteger;
+        Result.JanelaAltura :=
+          Consulta.FieldByName('janela_altura').AsInteger;
+        Result.JanelaMaximizada :=
+          Consulta.FieldByName('janela_maximizada').AsInteger <> 0;
       end;
 
       Consulta.Close;
@@ -287,6 +300,10 @@ begin
         'protecao_captura = :protecao_captura, ' +
         'sempre_no_topo = :sempre_no_topo, ' +
         'ocultar_icone_barra_tarefas = :ocultar_icone_barra_tarefas, ' +
+        'posicao_janela_salva = :posicao_janela_salva, ' +
+        'janela_esquerda = :janela_esquerda, janela_topo = :janela_topo, ' +
+        'janela_largura = :janela_largura, janela_altura = :janela_altura, ' +
+        'janela_maximizada = :janela_maximizada, ' +
         'atualizado_em = CURRENT_TIMESTAMP WHERE id = 1';
       Consulta.ParamByName('nome_fonte').AsWideString :=
         APreferencias.NomeFonte;
@@ -307,6 +324,17 @@ begin
         Ord(APreferencias.SempreNoTopo);
       Consulta.ParamByName('ocultar_icone_barra_tarefas').AsInteger :=
         Ord(APreferencias.OcultarIconeBarraTarefas);
+      Consulta.ParamByName('posicao_janela_salva').AsInteger :=
+        Ord(APreferencias.PosicaoJanelaSalva);
+      Consulta.ParamByName('janela_esquerda').AsInteger :=
+        APreferencias.JanelaEsquerda;
+      Consulta.ParamByName('janela_topo').AsInteger := APreferencias.JanelaTopo;
+      Consulta.ParamByName('janela_largura').AsInteger :=
+        APreferencias.JanelaLargura;
+      Consulta.ParamByName('janela_altura').AsInteger :=
+        APreferencias.JanelaAltura;
+      Consulta.ParamByName('janela_maximizada').AsInteger :=
+        Ord(APreferencias.JanelaMaximizada);
       Consulta.ExecSQL;
 
       FConexao.ExecSQL('DELETE FROM atalhos');

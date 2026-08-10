@@ -115,6 +115,12 @@ begin
     Preferencias.ProtecaoCaptura := False;
     Preferencias.SempreNoTopo := True;
     Preferencias.OcultarIconeBarraTarefas := True;
+    Preferencias.PosicaoJanelaSalva := True;
+    Preferencias.JanelaEsquerda := -1200;
+    Preferencias.JanelaTopo := 80;
+    Preferencias.JanelaLargura := 1440;
+    Preferencias.JanelaAltura := 900;
+    Preferencias.JanelaMaximizada := True;
     Assert.IsTrue(Preferencias.Atalhos.Definir(
       cmdInicio,
       0,
@@ -135,6 +141,12 @@ begin
     Assert.IsFalse(Carregadas.ProtecaoCaptura);
     Assert.IsTrue(Carregadas.SempreNoTopo);
     Assert.IsTrue(Carregadas.OcultarIconeBarraTarefas);
+    Assert.IsTrue(Carregadas.PosicaoJanelaSalva);
+    Assert.AreEqual(-1200, Carregadas.JanelaEsquerda);
+    Assert.AreEqual(80, Carregadas.JanelaTopo);
+    Assert.AreEqual(1440, Carregadas.JanelaLargura);
+    Assert.AreEqual(900, Carregadas.JanelaAltura);
+    Assert.IsTrue(Carregadas.JanelaMaximizada);
     Assert.IsTrue(Carregadas.Atalhos.Atalho(
       cmdInicio,
       0).Igual(TAtalho.Criar(Ord('P'), [maControle, maAlt])));
@@ -262,7 +274,7 @@ begin
   FRepositorioTextos := TRepositorioTextosSQLite.Create(FBancoDados.Conexao);
 
   Assert.AreEqual(
-    3,
+    4,
     Integer(FBancoDados.Conexao.ExecSQLScalar(
       'SELECT MAX(versao) FROM versoes_esquema')));
   Preferencias := FRepositorioPreferencias.Carregar;
@@ -270,6 +282,8 @@ begin
     Assert.IsTrue(Preferencias.ProtecaoCaptura);
     Assert.IsFalse(Preferencias.SempreNoTopo);
     Assert.IsFalse(Preferencias.OcultarIconeBarraTarefas);
+    Assert.IsFalse(Preferencias.PosicaoJanelaSalva);
+    Assert.IsFalse(Preferencias.JanelaMaximizada);
   finally
     Preferencias.Free;
   end;
@@ -352,7 +366,7 @@ begin
   FRepositorioTextos := TRepositorioTextosSQLite.Create(FBancoDados.Conexao);
 
   Assert.AreEqual(
-    3,
+    4,
     Integer(FBancoDados.Conexao.ExecSQLScalar(
       'SELECT MAX(versao) FROM versoes_esquema')));
   Preferencias := FRepositorioPreferencias.Carregar;
@@ -361,6 +375,8 @@ begin
     Assert.IsTrue(Preferencias.ProtecaoCaptura);
     Assert.IsFalse(Preferencias.SempreNoTopo);
     Assert.IsFalse(Preferencias.OcultarIconeBarraTarefas);
+    Assert.IsFalse(Preferencias.PosicaoJanelaSalva);
+    Assert.IsFalse(Preferencias.JanelaMaximizada);
     Assert.IsTrue(Preferencias.Atalhos.Atalho(
       cmdReproduzirPausar,
       1).Vazio);

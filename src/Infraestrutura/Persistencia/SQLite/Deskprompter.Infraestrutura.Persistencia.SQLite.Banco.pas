@@ -167,6 +167,38 @@ begin
       raise;
     end;
   end;
+
+  if VersaoAtual < 4 then
+  begin
+    FConexao.StartTransaction;
+    try
+      FConexao.ExecSQL(
+        'ALTER TABLE preferencias ADD COLUMN ' +
+        'posicao_janela_salva INTEGER NOT NULL DEFAULT 0');
+      FConexao.ExecSQL(
+        'ALTER TABLE preferencias ADD COLUMN ' +
+        'janela_esquerda INTEGER NOT NULL DEFAULT 0');
+      FConexao.ExecSQL(
+        'ALTER TABLE preferencias ADD COLUMN ' +
+        'janela_topo INTEGER NOT NULL DEFAULT 0');
+      FConexao.ExecSQL(
+        'ALTER TABLE preferencias ADD COLUMN ' +
+        'janela_largura INTEGER NOT NULL DEFAULT 1280');
+      FConexao.ExecSQL(
+        'ALTER TABLE preferencias ADD COLUMN ' +
+        'janela_altura INTEGER NOT NULL DEFAULT 760');
+      FConexao.ExecSQL(
+        'ALTER TABLE preferencias ADD COLUMN ' +
+        'janela_maximizada INTEGER NOT NULL DEFAULT 0');
+      FConexao.ExecSQL(
+        'INSERT INTO versoes_esquema (versao, aplicada_em) ' +
+        'VALUES (4, CURRENT_TIMESTAMP)');
+      FConexao.Commit;
+    except
+      FConexao.Rollback;
+      raise;
+    end;
+  end;
 end;
 
 procedure TBancoDadosSQLite.ConfigurarConexao;

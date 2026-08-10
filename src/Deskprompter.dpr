@@ -23,6 +23,7 @@ uses
   Deskprompter.VCL.ControladorAparencia in 'VCL\Deskprompter.VCL.ControladorAparencia.pas',
   Deskprompter.VCL.ControladorBiblioteca in 'VCL\Deskprompter.VCL.ControladorBiblioteca.pas',
   Deskprompter.VCL.ControladorComandos in 'VCL\Deskprompter.VCL.ControladorComandos.pas',
+  Deskprompter.VCL.ControladorEstadoJanela in 'VCL\Deskprompter.VCL.ControladorEstadoJanela.pas',
   Deskprompter.VCL.ControladorRolagem in 'VCL\Deskprompter.VCL.ControladorRolagem.pas',
   Deskprompter.VCL.ControladorSempreNoTopo in 'VCL\Deskprompter.VCL.ControladorSempreNoTopo.pas',
   Deskprompter.VCL.FormularioAtalhos in 'VCL\Deskprompter.VCL.FormularioAtalhos.pas' {FormularioAtalhos},

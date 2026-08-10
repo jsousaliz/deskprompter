@@ -98,6 +98,7 @@
     <DCCReference Include="VCL\Deskprompter.VCL.ControladorAparencia.pas" />
     <DCCReference Include="VCL\Deskprompter.VCL.ControladorBiblioteca.pas" />
     <DCCReference Include="VCL\Deskprompter.VCL.ControladorComandos.pas" />
+    <DCCReference Include="VCL\Deskprompter.VCL.ControladorEstadoJanela.pas" />
     <DCCReference Include="VCL\Deskprompter.VCL.ControladorProtecaoCaptura.pas" />
     <DCCReference Include="VCL\Deskprompter.VCL.ControladorRolagem.pas" />
     <DCCReference Include="VCL\Deskprompter.VCL.ControladorSempreNoTopo.pas" />

@@ -27,6 +27,7 @@ uses
   Deskprompter.VCL.ControladorAparencia,
   Deskprompter.VCL.ControladorBiblioteca,
   Deskprompter.VCL.ControladorComandos,
+  Deskprompter.VCL.ControladorEstadoJanela,
   Deskprompter.VCL.ControladorProtecaoCaptura,
   Deskprompter.VCL.ControladorRolagem,
   Deskprompter.VCL.ControladorSempreNoTopo,
@@ -172,6 +173,7 @@ type
     FControladorAparencia: TControladorAparencia;
     FControladorBiblioteca: TControladorBiblioteca;
     FControladorComandos: TControladorComandos;
+    FControladorEstadoJanela: TControladorEstadoJanela;
     FControladorProtecaoCaptura: TControladorProtecaoCaptura;
     FControladorRolagem: TControladorRolagem;
     FControladorSempreNoTopo: TControladorSempreNoTopo;
@@ -188,7 +190,8 @@ type
     FPreferencias: TPreferencias;
     FPreferenciasPendentes: Boolean;
     procedure AplicarOpacidade;
-    procedure AplicarPreferencias;
+    procedure AplicarPreferenciasDeAparencia;
+    procedure AplicarPreferenciasDeJanela;
     procedure AgendarSalvamentoPreferencias;
     procedure AtualizarAcoesBiblioteca;
     procedure AtualizarAreaDeTexto;
@@ -212,6 +215,7 @@ type
       const ARecalcularRolagem: Boolean = False);
     procedure ReaplicarProtecaoCaptura;
     procedure ReaplicarSempreNoTopo;
+    procedure RegistrarPosicaoJanela;
     procedure RolagemAlterada(Sender: TObject);
     procedure SalvarAlteracoesPendentes;
     procedure SalvarPreferencias;
@@ -219,6 +223,7 @@ type
     function TextoSelecionado: TTexto;
     procedure WMAplicarVisibilidadeBarraTarefas(
       var AMensagem: TMessage); message WM_APLICAR_VISIBILIDADE_BARRA_TAREFAS;
+    procedure WMExitSizeMove(var AMensagem: TMessage); message WM_EXITSIZEMOVE;
   protected
     procedure CreateWnd; override;
   public
@@ -318,7 +323,7 @@ begin
         [Resultado]));
 end;
 
-procedure TFormularioPrincipal.AplicarPreferencias;
+procedure TFormularioPrincipal.AplicarPreferenciasDeAparencia;
 var
   IndiceFonte: Integer;
 begin
@@ -346,6 +351,21 @@ begin
     FControladorAparencia.DefinirEspelhoVertical(
       FPreferencias.EspelhoVertical);
     FControladorRolagem.DefinirVelocidade(Velocidade.Position);
+    AplicarOpacidade;
+    AtualizarAvisoEspelhamento;
+    AtualizarRotulosAparencia;
+    AtualizarRotulosValores;
+  finally
+    FAtualizandoPreferencias := False;
+  end;
+end;
+
+procedure TFormularioPrincipal.AplicarPreferenciasDeJanela;
+begin
+  if not Assigned(FPreferencias) then
+    Exit;
+  FAtualizandoPreferencias := True;
+  try
     if FPreferencias.ProtecaoCaptura then
       ChaveProtecaoCaptura.State := tssOn
     else
@@ -366,10 +386,7 @@ begin
       ChaveOcultarIconeBarraTarefas.State := tssOff;
     DefinirOcultacaoIconeBarraTarefas(
       FPreferencias.OcultarIconeBarraTarefas);
-    AplicarOpacidade;
-    AtualizarAvisoEspelhamento;
-    AtualizarRotulosAparencia;
-    AtualizarRotulosValores;
+    FControladorEstadoJanela.Aplicar(FPreferencias);
   finally
     FAtualizandoPreferencias := False;
   end;
@@ -652,7 +669,7 @@ begin
     0) <> mrYes then
     Exit;
   FPreferencias.RestaurarAparenciaPadrao;
-  AplicarPreferencias;
+  AplicarPreferenciasDeAparencia;
   NotificarAlteracaoAparencia(True);
 end;
 
@@ -723,13 +740,12 @@ begin
   FControladorComandos := TControladorComandos.Create(
     FPreferencias.Atalhos,
     ExecutarComando);
-  AplicarPreferencias;
+  AplicarPreferenciasDeJanela;
+  AplicarPreferenciasDeAparencia;
   FControladorBiblioteca.Configurar(
     ARepositorioGrupos,
     ARepositorioTextos);
   FControladorBiblioteca.Carregar(TGUID.Empty);
-  ReaplicarProtecaoCaptura;
-  ReaplicarSempreNoTopo;
   FRegistroDiagnostico.Registrar(
     nrInformacao,
     'Biblioteca e preferencias locais carregadas');
@@ -769,6 +785,7 @@ begin
     FEstiloBordaAnterior := BorderStyle;
     FEstadoJanelaAnterior := WindowState;
     MonitorAtual := Self.Monitor;
+    FTelaCheia := True;
     WindowState := wsNormal;
     BorderStyle := bsNone;
     SetBounds(
@@ -776,7 +793,6 @@ begin
       MonitorAtual.BoundsRect.Top,
       MonitorAtual.BoundsRect.Width,
       MonitorAtual.BoundsRect.Height);
-    FTelaCheia := True;
     BotaoTelaCheia.Hint := 'Sair da tela cheia';
     BotaoTelaCheia.ImageIndex := Ord(iibSairTelaCheia);
   end
@@ -786,6 +802,7 @@ begin
     WindowState := FEstadoJanelaAnterior;
     BoundsRect := FLimitesAnteriores;
     FTelaCheia := False;
+    FControladorEstadoJanela.Atualizar(FTelaCheia);
     BotaoTelaCheia.Hint := 'Entrar em tela cheia';
     BotaoTelaCheia.ImageIndex := Ord(iibTelaCheia);
   end;
@@ -937,6 +954,7 @@ procedure TFormularioPrincipal.FormularioCloseQuery(
   var CanClose: Boolean);
 begin
   SalvarAlteracoesPendentes;
+  RegistrarPosicaoJanela;
   SalvarPreferencias;
   CanClose := not FAlteracaoPendente and not FPreferenciasPendentes;
 end;
@@ -955,6 +973,7 @@ end;
 
 procedure TFormularioPrincipal.CriarControladores;
 begin
+  FControladorEstadoJanela := TControladorEstadoJanela.Create(Self);
   FControladorBiblioteca := TControladorBiblioteca.Create(
     ArvoreConteudo,
     SelecionarTexto,
@@ -1018,6 +1037,7 @@ begin
   FListaBarraTarefas := nil;
   FControladorComandos.Free;
   FPreferencias.Free;
+  FControladorEstadoJanela.Free;
   FControladorSempreNoTopo.Free;
   FControladorProtecaoCaptura.Free;
   FControladorRolagem.Free;
@@ -1040,6 +1060,8 @@ end;
 procedure TFormularioPrincipal.FormularioResize(Sender: TObject);
 begin
   AplicarVisibilidadeBarraTarefas;
+  if Assigned(FControladorEstadoJanela) then
+    FControladorEstadoJanela.Atualizar(FTelaCheia);
   if Assigned(PainelMostrarOpcoes) and not FOpcoesVisiveis then
     PainelMostrarOpcoes.BringToFront;
   AtualizarAreaDeTexto;
@@ -1069,6 +1091,17 @@ procedure TFormularioPrincipal.ReaplicarSempreNoTopo;
 begin
   if Assigned(FControladorSempreNoTopo) and HandleAllocated then
     FControladorSempreNoTopo.Aplicar(NativeUInt(Handle));
+end;
+
+procedure TFormularioPrincipal.RegistrarPosicaoJanela;
+begin
+  if Assigned(FControladorEstadoJanela) and
+     FControladorEstadoJanela.Registrar(
+       FPreferencias,
+       FTelaCheia,
+       FLimitesAnteriores,
+       FEstadoJanelaAnterior) then
+    FPreferenciasPendentes := True;
 end;
 
 procedure TFormularioPrincipal.SalvarPreferencias;
@@ -1224,6 +1257,13 @@ procedure TFormularioPrincipal.WMAplicarVisibilidadeBarraTarefas(
   var AMensagem: TMessage);
 begin
   AplicarVisibilidadeBarraTarefas;
+end;
+
+procedure TFormularioPrincipal.WMExitSizeMove(var AMensagem: TMessage);
+begin
+  inherited;
+  if Assigned(FControladorEstadoJanela) then
+    FControladorEstadoJanela.Atualizar(FTelaCheia);
 end;
 
 procedure TFormularioPrincipal.ValoresChange(Sender: TObject);

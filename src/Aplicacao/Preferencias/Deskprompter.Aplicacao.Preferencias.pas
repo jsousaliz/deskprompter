@@ -13,6 +13,11 @@ type
     FCorFonte: Integer;
     FEspelhoHorizontal: Boolean;
     FEspelhoVertical: Boolean;
+    FJanelaAltura: Integer;
+    FJanelaEsquerda: Integer;
+    FJanelaLargura: Integer;
+    FJanelaMaximizada: Boolean;
+    FJanelaTopo: Integer;
     FOcultarIconeBarraTarefas: Boolean;
     FMargem: Integer;
     FNomeFonte: string;
@@ -20,6 +25,7 @@ type
     FTamanhoFonte: Integer;
     FVelocidade: Integer;
     FProtecaoCaptura: Boolean;
+    FPosicaoJanelaSalva: Boolean;
     FSempreNoTopo: Boolean;
     procedure SetMargem(const AValor: Integer);
     procedure SetNomeFonte(const AValor: string);
@@ -40,6 +46,13 @@ type
       read FEspelhoHorizontal write FEspelhoHorizontal;
     property EspelhoVertical: Boolean
       read FEspelhoVertical write FEspelhoVertical;
+    property JanelaAltura: Integer read FJanelaAltura write FJanelaAltura;
+    property JanelaEsquerda: Integer
+      read FJanelaEsquerda write FJanelaEsquerda;
+    property JanelaLargura: Integer read FJanelaLargura write FJanelaLargura;
+    property JanelaMaximizada: Boolean
+      read FJanelaMaximizada write FJanelaMaximizada;
+    property JanelaTopo: Integer read FJanelaTopo write FJanelaTopo;
     property Margem: Integer read FMargem write SetMargem;
     property NomeFonte: string read FNomeFonte write SetNomeFonte;
     property OcultarIconeBarraTarefas: Boolean
@@ -47,6 +60,8 @@ type
     property Opacidade: Integer read FOpacidade write SetOpacidade;
     property ProtecaoCaptura: Boolean
       read FProtecaoCaptura write FProtecaoCaptura;
+    property PosicaoJanelaSalva: Boolean
+      read FPosicaoJanelaSalva write FPosicaoJanelaSalva;
     property SempreNoTopo: Boolean read FSempreNoTopo write FSempreNoTopo;
     property TamanhoFonte: Integer read FTamanhoFonte write SetTamanhoFonte;
     property Velocidade: Integer read FVelocidade write SetVelocidade;
@@ -83,6 +98,12 @@ begin
   FProtecaoCaptura := True;
   FSempreNoTopo := False;
   FOcultarIconeBarraTarefas := False;
+  FPosicaoJanelaSalva := False;
+  FJanelaEsquerda := 0;
+  FJanelaTopo := 0;
+  FJanelaLargura := 1280;
+  FJanelaAltura := 760;
+  FJanelaMaximizada := False;
 end;
 
 procedure TPreferencias.RestaurarAparenciaPadrao;
