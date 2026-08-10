@@ -72,7 +72,39 @@ dcu/
 └── tests/<Configuracao>/
 ```
 
-## Instalador
+## Instalação
+
+1. Acesse a página de [releases do Deskprompter](https://github.com/jsousaliz/deskprompter/releases).
+2. Baixe o instalador `Deskprompter-Setup-<versão>.exe` e o arquivo
+   `.sha256` correspondente.
+3. Confira a integridade do instalador no PowerShell, substituindo o nome pela
+   versão baixada:
+
+```powershell
+(Get-FileHash .\Deskprompter-Setup-1.1.0.exe -Algorithm SHA256).Hash.ToLowerInvariant()
+```
+
+O valor exibido deve ser igual ao registrado no arquivo `.sha256`. Depois da
+verificação, execute o instalador e siga as etapas apresentadas.
+
+### Aviso do Microsoft Defender SmartScreen
+
+Durante a instalação, o Windows pode exibir a mensagem “O Windows protegeu o
+computador”. Isso acontece porque o instalador do Deskprompter ainda não possui
+uma assinatura digital de um editor reconhecido e pode não ter reputação
+suficiente no Microsoft Defender SmartScreen. O aviso, isoladamente, não indica
+que o arquivo contém uma ameaça.
+
+Baixe o instalador somente da página oficial de releases e confirme o SHA-256
+antes de continuar. Depois, selecione `Mais informações` e clique em
+`Executar assim mesmo`, conforme mostrado abaixo.
+
+<p align="center">
+  <img src="docs/instalador-help1.png" width="48%" alt="Aviso do SmartScreen com a opção Mais informações destacada">
+  <img src="docs/instalador-help2.png" width="48%" alt="Aviso do SmartScreen com a opção Executar assim mesmo destacada">
+</p>
+
+## Geração do instalador
 
 O instalador tradicional é gerado com o Inno Setup 6 a partir de
 `tools/instalador/Deskprompter.iss`:
