@@ -206,9 +206,6 @@ type
     procedure DefinirVisibilidadeOpcoes(const AVisiveis: Boolean);
     procedure DestacarAvisoEspelhamento;
     procedure ExecutarComando(const AComando: TComando);
-    function EditorDeveProcessarTecla(
-      const ATecla: Word;
-      const AModificadores: TShiftState): Boolean;
     procedure InicializarEstadoDaInterface;
     procedure InicializarListaBarraTarefas;
     procedure NotificarAlteracaoAparencia(
@@ -300,12 +297,15 @@ end;
 
 procedure TFormularioPrincipal.AplicarVisibilidadeBarraTarefas;
 var
+  OcultarEfetivamente: Boolean;
   Resultado: HRESULT;
 begin
   if not Assigned(FListaBarraTarefas) or not HandleAllocated then
     Exit;
 
-  if FOcultarIconeBarraTarefas then
+  OcultarEfetivamente := FOcultarIconeBarraTarefas and
+    (WindowState <> wsMinimized);
+  if OcultarEfetivamente then
     Resultado := FListaBarraTarefas.DeleteTab(Handle)
   else
     Resultado := FListaBarraTarefas.AddTab(Handle);
@@ -885,43 +885,6 @@ begin
   end;
 end;
 
-function TFormularioPrincipal.EditorDeveProcessarTecla(
-  const ATecla: Word;
-  const AModificadores: TShiftState): Boolean;
-begin
-  Result := False;
-  if ActiveControl <> EditorTexto then
-    Exit;
-
-  if ssAlt in AModificadores then
-    Exit;
-
-  if ATecla in [
-    VK_BACK,
-    VK_RETURN,
-    VK_INSERT,
-    VK_DELETE,
-    VK_HOME,
-    VK_END,
-    VK_PRIOR,
-    VK_NEXT,
-    VK_LEFT,
-    VK_UP,
-    VK_RIGHT,
-    VK_DOWN] then
-    Exit(True);
-
-  if (ssCtrl in AModificadores) and
-     ((ATecla = VK_SPACE) or
-      (ATecla in [Ord('A'), Ord('C'), Ord('V'), Ord('X'), Ord('Y'), Ord('Z')])) then
-    Exit(True);
-
-  Result := not (ssCtrl in AModificadores) and
-    (((ATecla >= Ord('0')) and (ATecla <= Ord('Z'))) or
-     ((ATecla >= $BA) and (ATecla <= $E2)) or
-     (ATecla = VK_SPACE));
-end;
-
 procedure TFormularioPrincipal.DesenhoEspelhoPaint(Sender: TObject);
 begin
   FControladorAparencia.PintarEspelho(
@@ -1070,15 +1033,13 @@ begin
   if not Assigned(FControladorComandos) then
     Exit;
 
-  if EditorDeveProcessarTecla(Key, Shift) then
-    Exit;
-
   if FControladorComandos.ProcessarTecla(Key, Shift) then
     Key := 0;
 end;
 
 procedure TFormularioPrincipal.FormularioResize(Sender: TObject);
 begin
+  AplicarVisibilidadeBarraTarefas;
   if Assigned(PainelMostrarOpcoes) and not FOpcoesVisiveis then
     PainelMostrarOpcoes.BringToFront;
   AtualizarAreaDeTexto;
