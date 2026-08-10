@@ -19,7 +19,7 @@ Para compilar a aplicação, executar os testes, gerar o instalador e calcular s
 SHA-256 em uma única operação:
 
 ```powershell
-.\tools\instalador\Construir.ps1 -Versao 0.1.0
+.\tools\instalador\Construir.ps1 -Versao 1.1.0
 ```
 
 O resultado preparado para distribuição será gravado em `dist`.

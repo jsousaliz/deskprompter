@@ -6,6 +6,8 @@ uses
   System.Classes,
   System.ImageList,
   System.Types,
+  Winapi.Messages,
+  Winapi.ShlObj,
   Vcl.Buttons,
   Vcl.ComCtrls,
   Vcl.Controls,
@@ -31,12 +33,16 @@ uses
   Deskprompter.VCL.FormularioAtalhos,
   Deskprompter.Dominio.Textos;
 
+const
+  WM_APLICAR_VISIBILIDADE_BARRA_TAREFAS = WM_APP + 1;
+
 type
   TFormularioPrincipal = class(TForm)
     ArvoreConteudo: TTreeView;
     BarraEstado: TPanel;
     ChaveProtecaoCaptura: TToggleSwitch;
     ChaveSempreNoTopo: TToggleSwitch;
+    ChaveOcultarIconeBarraTarefas: TToggleSwitch;
     BotaoBaixo: TSpeedButton;
     BotaoExcluir: TSpeedButton;
     BotaoNovoGrupo: TSpeedButton;
@@ -53,6 +59,7 @@ type
     RotuloArvore: TLabel;
     RotuloEstadoCaptura: TLabel;
     RotuloSempreNoTopo: TLabel;
+    RotuloOcultarIconeBarraTarefas: TLabel;
     RotuloSalvamento: TLabel;
     TemporizadorRolagem: TTimer;
     TemporizadorSalvamento: TTimer;
@@ -140,6 +147,7 @@ type
     procedure BotaoProximoTextoClick(Sender: TObject);
     procedure ChaveProtecaoCapturaClick(Sender: TObject);
     procedure ChaveSempreNoTopoClick(Sender: TObject);
+    procedure ChaveOcultarIconeBarraTarefasClick(Sender: TObject);
     procedure DesenhoEspelhoMouseDown(Sender: TObject;
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure DesenhoEspelhoPaint(Sender: TObject);
@@ -169,11 +177,13 @@ type
     FControladorSempreNoTopo: TControladorSempreNoTopo;
     FEstadoJanelaAnterior: TWindowState;
     FEstiloBordaAnterior: TFormBorderStyle;
+    FListaBarraTarefas: ITaskbarList;
     FLimitesAnteriores: TRect;
     FRegistroDiagnostico: IRegistroDiagnostico;
     FRepositorioPreferencias: IRepositorioPreferencias;
     FTelaCheia: Boolean;
     FOpcoesVisiveis: Boolean;
+    FOcultarIconeBarraTarefas: Boolean;
     FPassoDestaqueAvisoEspelhamento: Integer;
     FPreferencias: TPreferencias;
     FPreferenciasPendentes: Boolean;
@@ -191,10 +201,16 @@ type
     procedure ConfigurarFormularioEmTempoDeExecucao;
     procedure CriarControladores;
     procedure DefinirTelaCheia(const AAtivar: Boolean);
+    procedure AplicarVisibilidadeBarraTarefas;
+    procedure DefinirOcultacaoIconeBarraTarefas(const AOcultar: Boolean);
     procedure DefinirVisibilidadeOpcoes(const AVisiveis: Boolean);
     procedure DestacarAvisoEspelhamento;
     procedure ExecutarComando(const AComando: TComando);
+    function EditorDeveProcessarTecla(
+      const ATecla: Word;
+      const AModificadores: TShiftState): Boolean;
     procedure InicializarEstadoDaInterface;
+    procedure InicializarListaBarraTarefas;
     procedure NotificarAlteracaoAparencia(
       const ARecalcularRolagem: Boolean = False);
     procedure ReaplicarProtecaoCaptura;
@@ -204,6 +220,8 @@ type
     procedure SalvarPreferencias;
     procedure SelecionarTexto(const ATexto: TTexto);
     function TextoSelecionado: TTexto;
+    procedure WMAplicarVisibilidadeBarraTarefas(
+      var AMensagem: TMessage); message WM_APLICAR_VISIBILIDADE_BARRA_TAREFAS;
   protected
     procedure CreateWnd; override;
   public
@@ -228,6 +246,8 @@ uses
   System.Math,
   System.SysUtils,
   System.UITypes,
+  System.Win.ComObj,
+  Winapi.ActiveX,
   Winapi.Windows,
   Vcl.Graphics,
   Deskprompter.Dominio.Grupos,
@@ -278,6 +298,26 @@ begin
   ReaplicarProtecaoCaptura;
 end;
 
+procedure TFormularioPrincipal.AplicarVisibilidadeBarraTarefas;
+var
+  Resultado: HRESULT;
+begin
+  if not Assigned(FListaBarraTarefas) or not HandleAllocated then
+    Exit;
+
+  if FOcultarIconeBarraTarefas then
+    Resultado := FListaBarraTarefas.DeleteTab(Handle)
+  else
+    Resultado := FListaBarraTarefas.AddTab(Handle);
+
+  if Failed(Resultado) and Assigned(FRegistroDiagnostico) then
+    FRegistroDiagnostico.Registrar(
+      nrAviso,
+      Format(
+        'Falha ao alterar visibilidade na barra de tarefas. Codigo: %d',
+        [Resultado]));
+end;
+
 procedure TFormularioPrincipal.AplicarPreferencias;
 var
   IndiceFonte: Integer;
@@ -306,6 +346,26 @@ begin
     FControladorAparencia.DefinirEspelhoVertical(
       FPreferencias.EspelhoVertical);
     FControladorRolagem.DefinirVelocidade(Velocidade.Position);
+    if FPreferencias.ProtecaoCaptura then
+      ChaveProtecaoCaptura.State := tssOn
+    else
+      ChaveProtecaoCaptura.State := tssOff;
+    FControladorProtecaoCaptura.DefinirAtiva(
+      FPreferencias.ProtecaoCaptura,
+      NativeUInt(Handle));
+    if FPreferencias.SempreNoTopo then
+      ChaveSempreNoTopo.State := tssOn
+    else
+      ChaveSempreNoTopo.State := tssOff;
+    FControladorSempreNoTopo.DefinirAtivo(
+      FPreferencias.SempreNoTopo,
+      NativeUInt(Handle));
+    if FPreferencias.OcultarIconeBarraTarefas then
+      ChaveOcultarIconeBarraTarefas.State := tssOn
+    else
+      ChaveOcultarIconeBarraTarefas.State := tssOff;
+    DefinirOcultacaoIconeBarraTarefas(
+      FPreferencias.OcultarIconeBarraTarefas);
     AplicarOpacidade;
     AtualizarAvisoEspelhamento;
     AtualizarRotulosAparencia;
@@ -613,16 +673,32 @@ end;
 
 procedure TFormularioPrincipal.ChaveProtecaoCapturaClick(Sender: TObject);
 begin
+  if FAtualizandoPreferencias then
+    Exit;
   FControladorProtecaoCaptura.DefinirAtiva(
     ChaveProtecaoCaptura.State = tssOn,
     NativeUInt(Handle));
+  AgendarSalvamentoPreferencias;
 end;
 
 procedure TFormularioPrincipal.ChaveSempreNoTopoClick(Sender: TObject);
 begin
+  if FAtualizandoPreferencias then
+    Exit;
   FControladorSempreNoTopo.DefinirAtivo(
     ChaveSempreNoTopo.State = tssOn,
     NativeUInt(Handle));
+  AgendarSalvamentoPreferencias;
+end;
+
+procedure TFormularioPrincipal.ChaveOcultarIconeBarraTarefasClick(
+  Sender: TObject);
+begin
+  if FAtualizandoPreferencias then
+    Exit;
+  DefinirOcultacaoIconeBarraTarefas(
+    ChaveOcultarIconeBarraTarefas.State = tssOn);
+  AgendarSalvamentoPreferencias;
 end;
 
 procedure TFormularioPrincipal.Configurar(
@@ -664,6 +740,21 @@ begin
   inherited;
   ReaplicarProtecaoCaptura;
   ReaplicarSempreNoTopo;
+  if Assigned(FListaBarraTarefas) then
+    PostMessage(Handle, WM_APLICAR_VISIBILIDADE_BARRA_TAREFAS, 0, 0);
+end;
+
+procedure TFormularioPrincipal.DefinirOcultacaoIconeBarraTarefas(
+  const AOcultar: Boolean);
+begin
+  if AOcultar then
+    RotuloOcultarIconeBarraTarefas.Font.Color := $0068D391
+  else
+    RotuloOcultarIconeBarraTarefas.Font.Color := $004040FF;
+
+  FOcultarIconeBarraTarefas := AOcultar;
+  if HandleAllocated then
+    PostMessage(Handle, WM_APLICAR_VISIBILIDADE_BARRA_TAREFAS, 0, 0);
 end;
 
 procedure TFormularioPrincipal.DefinirTelaCheia(const AAtivar: Boolean);
@@ -794,6 +885,43 @@ begin
   end;
 end;
 
+function TFormularioPrincipal.EditorDeveProcessarTecla(
+  const ATecla: Word;
+  const AModificadores: TShiftState): Boolean;
+begin
+  Result := False;
+  if ActiveControl <> EditorTexto then
+    Exit;
+
+  if ssAlt in AModificadores then
+    Exit;
+
+  if ATecla in [
+    VK_BACK,
+    VK_RETURN,
+    VK_INSERT,
+    VK_DELETE,
+    VK_HOME,
+    VK_END,
+    VK_PRIOR,
+    VK_NEXT,
+    VK_LEFT,
+    VK_UP,
+    VK_RIGHT,
+    VK_DOWN] then
+    Exit(True);
+
+  if (ssCtrl in AModificadores) and
+     ((ATecla = VK_SPACE) or
+      (ATecla in [Ord('A'), Ord('C'), Ord('V'), Ord('X'), Ord('Y'), Ord('Z')])) then
+    Exit(True);
+
+  Result := not (ssCtrl in AModificadores) and
+    (((ATecla >= Ord('0')) and (ATecla <= Ord('Z'))) or
+     ((ATecla >= $BA) and (ATecla <= $E2)) or
+     (ATecla = VK_SPACE));
+end;
+
 procedure TFormularioPrincipal.DesenhoEspelhoPaint(Sender: TObject);
 begin
   FControladorAparencia.PintarEspelho(
@@ -900,9 +1028,22 @@ begin
   DefinirVisibilidadeOpcoes(True);
 end;
 
+procedure TFormularioPrincipal.InicializarListaBarraTarefas;
+begin
+  try
+    FListaBarraTarefas :=
+      CreateComObject(CLSID_TaskbarList) as ITaskbarList;
+    if Failed(FListaBarraTarefas.HrInit) then
+      FListaBarraTarefas := nil;
+  except
+    FListaBarraTarefas := nil;
+  end;
+end;
+
 procedure TFormularioPrincipal.FormularioCreate(Sender: TObject);
 begin
   ConfigurarFormularioEmTempoDeExecucao;
+  InicializarListaBarraTarefas;
   CriarControladores;
   CarregarFontesDisponiveis;
   InicializarEstadoDaInterface;
@@ -911,6 +1052,7 @@ end;
 procedure TFormularioPrincipal.FormularioDestroy(Sender: TObject);
 begin
   TemporizadorAvisoEspelhamento.Enabled := False;
+  FListaBarraTarefas := nil;
   FControladorComandos.Free;
   FPreferencias.Free;
   FControladorSempreNoTopo.Free;
@@ -928,9 +1070,7 @@ begin
   if not Assigned(FControladorComandos) then
     Exit;
 
-  if (ActiveControl = EditorTexto) and
-     not (ssCtrl in Shift) and not (ssAlt in Shift) and
-     (Key in [VK_LEFT, VK_RIGHT, VK_HOME, VK_PRIOR, VK_NEXT]) then
+  if EditorDeveProcessarTecla(Key, Shift) then
     Exit;
 
   if FControladorComandos.ProcessarTecla(Key, Shift) then
@@ -988,6 +1128,10 @@ begin
       FControladorAparencia.EspelhoHorizontal;
     FPreferencias.EspelhoVertical :=
       FControladorAparencia.EspelhoVertical;
+    FPreferencias.ProtecaoCaptura := FControladorProtecaoCaptura.Ativa;
+    FPreferencias.SempreNoTopo := FControladorSempreNoTopo.Ativo;
+    FPreferencias.OcultarIconeBarraTarefas :=
+      FOcultarIconeBarraTarefas;
     FRepositorioPreferencias.Salvar(FPreferencias);
     FPreferenciasPendentes := False;
     RotuloSalvamento.Caption := 'Preferencias salvas localmente';
@@ -1113,6 +1257,12 @@ end;
 function TFormularioPrincipal.TextoSelecionado: TTexto;
 begin
   Result := FControladorBiblioteca.TextoApresentado;
+end;
+
+procedure TFormularioPrincipal.WMAplicarVisibilidadeBarraTarefas(
+  var AMensagem: TMessage);
+begin
+  AplicarVisibilidadeBarraTarefas;
 end;
 
 procedure TFormularioPrincipal.ValoresChange(Sender: TObject);

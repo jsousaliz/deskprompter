@@ -26,6 +26,7 @@ type
     procedure DefinirAtiva(
       const AAtiva: Boolean;
       const AIdentificadorJanela: NativeUInt);
+    property Ativa: Boolean read FAtivacaoDesejada;
   end;
 
 implementation

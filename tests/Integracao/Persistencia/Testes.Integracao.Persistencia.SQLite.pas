@@ -43,6 +43,8 @@ type
     procedure PersistirUnicodeETextoLongo;
     [Test]
     procedure MigrarVersaoUmSemPerderConteudo;
+    [Test]
+    procedure MigrarVersaoDoisEAtualizarSomenteAtalhosPadrao;
   end;
 
 implementation
@@ -110,6 +112,9 @@ begin
     Preferencias.Margem := 88;
     Preferencias.Velocidade := 125;
     Preferencias.EspelhoHorizontal := True;
+    Preferencias.ProtecaoCaptura := False;
+    Preferencias.SempreNoTopo := True;
+    Preferencias.OcultarIconeBarraTarefas := True;
     Assert.IsTrue(Preferencias.Atalhos.Definir(
       cmdInicio,
       0,
@@ -127,6 +132,9 @@ begin
     Assert.AreEqual(88, Carregadas.Margem);
     Assert.AreEqual(125, Carregadas.Velocidade);
     Assert.IsTrue(Carregadas.EspelhoHorizontal);
+    Assert.IsFalse(Carregadas.ProtecaoCaptura);
+    Assert.IsTrue(Carregadas.SempreNoTopo);
+    Assert.IsTrue(Carregadas.OcultarIconeBarraTarefas);
     Assert.IsTrue(Carregadas.Atalhos.Atalho(
       cmdInicio,
       0).Igual(TAtalho.Criar(Ord('P'), [maControle, maAlt])));
@@ -220,6 +228,7 @@ procedure TTestesPersistenciaSQLite.MigrarVersaoUmSemPerderConteudo;
 var
   Grupo: TGrupo;
   Grupos: TObjectList<TGrupo>;
+  Preferencias: TPreferencias;
   Texto: TTexto;
   Textos: TObjectList<TTexto>;
 begin
@@ -243,7 +252,7 @@ begin
   FBancoDados.Conexao.ExecSQL('DROP TABLE atalhos');
   FBancoDados.Conexao.ExecSQL('DROP TABLE preferencias');
   FBancoDados.Conexao.ExecSQL(
-    'DELETE FROM versoes_esquema WHERE versao = 2');
+    'DELETE FROM versoes_esquema WHERE versao >= 2');
   FreeAndNil(FBancoDados);
 
   FBancoDados := TBancoDadosSQLite.Create(FCaminhoBanco);
@@ -253,9 +262,17 @@ begin
   FRepositorioTextos := TRepositorioTextosSQLite.Create(FBancoDados.Conexao);
 
   Assert.AreEqual(
-    2,
+    3,
     Integer(FBancoDados.Conexao.ExecSQLScalar(
       'SELECT MAX(versao) FROM versoes_esquema')));
+  Preferencias := FRepositorioPreferencias.Carregar;
+  try
+    Assert.IsTrue(Preferencias.ProtecaoCaptura);
+    Assert.IsFalse(Preferencias.SempreNoTopo);
+    Assert.IsFalse(Preferencias.OcultarIconeBarraTarefas);
+  finally
+    Preferencias.Free;
+  end;
   Grupos := FRepositorioGrupos.Listar;
   try
     Assert.AreEqual(1, Integer(Grupos.Count));
@@ -272,6 +289,98 @@ begin
     end;
   finally
     Grupos.Free;
+  end;
+end;
+
+procedure TTestesPersistenciaSQLite.MigrarVersaoDoisEAtualizarSomenteAtalhosPadrao;
+var
+  Preferencias: TPreferencias;
+begin
+  FRepositorioPreferencias := nil;
+  FRepositorioTextos := nil;
+  FRepositorioGrupos := nil;
+  FBancoDados.Conexao.ExecSQL('DROP TABLE atalhos');
+  FBancoDados.Conexao.ExecSQL('DROP TABLE preferencias');
+  FBancoDados.Conexao.ExecSQL(
+    'DELETE FROM versoes_esquema WHERE versao >= 2');
+  FBancoDados.Conexao.ExecSQL(
+    'CREATE TABLE preferencias (' +
+    '  id INTEGER NOT NULL PRIMARY KEY CHECK (id = 1),' +
+    '  nome_perfil TEXT NOT NULL DEFAULT ''Padrao'',' +
+    '  nome_fonte TEXT NOT NULL,' +
+    '  tamanho_fonte INTEGER NOT NULL,' +
+    '  cor_fonte INTEGER NOT NULL,' +
+    '  cor_fundo INTEGER NOT NULL,' +
+    '  opacidade INTEGER NOT NULL,' +
+    '  margem INTEGER NOT NULL,' +
+    '  velocidade INTEGER NOT NULL,' +
+    '  espelho_horizontal INTEGER NOT NULL,' +
+    '  espelho_vertical INTEGER NOT NULL,' +
+    '  atualizado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP' +
+    ')');
+  FBancoDados.Conexao.ExecSQL(
+    'CREATE TABLE atalhos (' +
+    '  comando INTEGER NOT NULL,' +
+    '  indice INTEGER NOT NULL CHECK (indice BETWEEN 0 AND 1),' +
+    '  tecla INTEGER NOT NULL,' +
+    '  modificadores INTEGER NOT NULL,' +
+    '  PRIMARY KEY (comando, indice)' +
+    ')');
+  FBancoDados.Conexao.ExecSQL(
+    'INSERT INTO preferencias (' +
+    '  id, nome_fonte, tamanho_fonte, cor_fonte, cor_fundo, ' +
+    '  opacidade, margem, velocidade, espelho_horizontal, ' +
+    '  espelho_vertical' +
+    ') VALUES (1, ''Arial'', 36, 16777215, 1381653, 90, 55, 75, 0, 0)');
+  FBancoDados.Conexao.ExecSQL(
+    'INSERT INTO atalhos (comando, indice, tecla, modificadores) VALUES ' +
+    '(0, 1, 32, 1), ' +
+    '(1, 0, 39, 1), ' +
+    '(2, 0, 37, 1), ' +
+    '(5, 0, 38, 1), ' +
+    '(6, 0, 40, 1), ' +
+    '(11, 0, 80, 3)');
+  FBancoDados.Conexao.ExecSQL(
+    'INSERT INTO versoes_esquema (versao, aplicada_em) ' +
+    'VALUES (2, CURRENT_TIMESTAMP)');
+  FreeAndNil(FBancoDados);
+
+  FBancoDados := TBancoDadosSQLite.Create(FCaminhoBanco);
+  FRepositorioGrupos := TRepositorioGruposSQLite.Create(FBancoDados.Conexao);
+  FRepositorioPreferencias :=
+    TRepositorioPreferenciasSQLite.Create(FBancoDados.Conexao);
+  FRepositorioTextos := TRepositorioTextosSQLite.Create(FBancoDados.Conexao);
+
+  Assert.AreEqual(
+    3,
+    Integer(FBancoDados.Conexao.ExecSQLScalar(
+      'SELECT MAX(versao) FROM versoes_esquema')));
+  Preferencias := FRepositorioPreferencias.Carregar;
+  try
+    Assert.AreEqual('Arial', Preferencias.NomeFonte);
+    Assert.IsTrue(Preferencias.ProtecaoCaptura);
+    Assert.IsFalse(Preferencias.SempreNoTopo);
+    Assert.IsFalse(Preferencias.OcultarIconeBarraTarefas);
+    Assert.IsTrue(Preferencias.Atalhos.Atalho(
+      cmdReproduzirPausar,
+      1).Vazio);
+    Assert.IsTrue(Preferencias.Atalhos.Atalho(
+      cmdTextoSeguinte,
+      0).Igual(TAtalho.Criar($27, [maAlt])));
+    Assert.IsTrue(Preferencias.Atalhos.Atalho(
+      cmdTextoAnterior,
+      0).Igual(TAtalho.Criar($25, [maAlt])));
+    Assert.IsTrue(Preferencias.Atalhos.Atalho(
+      cmdAumentarVelocidade,
+      0).Igual(TAtalho.Criar($26, [maAlt])));
+    Assert.IsTrue(Preferencias.Atalhos.Atalho(
+      cmdDiminuirVelocidade,
+      0).Igual(TAtalho.Criar($28, [maAlt])));
+    Assert.IsTrue(Preferencias.Atalhos.Atalho(
+      cmdInicio,
+      0).Igual(TAtalho.Criar(Ord('P'), [maControle, maAlt])));
+  finally
+    Preferencias.Free;
   end;
 end;
 

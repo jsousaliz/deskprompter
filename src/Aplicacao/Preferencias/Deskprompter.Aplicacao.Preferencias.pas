@@ -13,11 +13,14 @@ type
     FCorFonte: Integer;
     FEspelhoHorizontal: Boolean;
     FEspelhoVertical: Boolean;
+    FOcultarIconeBarraTarefas: Boolean;
     FMargem: Integer;
     FNomeFonte: string;
     FOpacidade: Integer;
     FTamanhoFonte: Integer;
     FVelocidade: Integer;
+    FProtecaoCaptura: Boolean;
+    FSempreNoTopo: Boolean;
     procedure SetMargem(const AValor: Integer);
     procedure SetNomeFonte(const AValor: string);
     procedure SetOpacidade(const AValor: Integer);
@@ -27,6 +30,7 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure RestaurarAparenciaPadrao;
+    procedure RestaurarEstadosJanelaPadrao;
     procedure RestaurarPadroes;
 
     property Atalhos: TCatalogoAtalhos read FAtalhos;
@@ -38,7 +42,12 @@ type
       read FEspelhoVertical write FEspelhoVertical;
     property Margem: Integer read FMargem write SetMargem;
     property NomeFonte: string read FNomeFonte write SetNomeFonte;
+    property OcultarIconeBarraTarefas: Boolean
+      read FOcultarIconeBarraTarefas write FOcultarIconeBarraTarefas;
     property Opacidade: Integer read FOpacidade write SetOpacidade;
+    property ProtecaoCaptura: Boolean
+      read FProtecaoCaptura write FProtecaoCaptura;
+    property SempreNoTopo: Boolean read FSempreNoTopo write FSempreNoTopo;
     property TamanhoFonte: Integer read FTamanhoFonte write SetTamanhoFonte;
     property Velocidade: Integer read FVelocidade write SetVelocidade;
   end;
@@ -65,7 +74,15 @@ end;
 procedure TPreferencias.RestaurarPadroes;
 begin
   RestaurarAparenciaPadrao;
+  RestaurarEstadosJanelaPadrao;
   FAtalhos.RestaurarPadroes;
+end;
+
+procedure TPreferencias.RestaurarEstadosJanelaPadrao;
+begin
+  FProtecaoCaptura := True;
+  FSempreNoTopo := False;
+  FOcultarIconeBarraTarefas := False;
 end;
 
 procedure TPreferencias.RestaurarAparenciaPadrao;

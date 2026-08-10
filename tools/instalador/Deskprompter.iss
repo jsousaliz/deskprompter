@@ -1,6 +1,6 @@
 #define NomeAplicativo "Deskprompter"
 #ifndef VersaoAplicativo
-#define VersaoAplicativo "0.1.0"
+#define VersaoAplicativo "1.1.0"
 #endif
 #define ExecutavelAplicativo "Deskprompter.exe"
 

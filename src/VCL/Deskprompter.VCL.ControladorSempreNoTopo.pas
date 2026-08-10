@@ -38,10 +38,10 @@ constructor TControladorSempreNoTopo.Create(const ARotuloEstado: TLabel);
 begin
   inherited Create;
   FRotuloEstado := ARotuloEstado;
-  FAtivacaoDesejada := True;
+  FAtivacaoDesejada := False;
   FResultado := TResultadoPosicionamentoJanela.Criar(
     True,
-    'Modo sempre no topo ativo');
+    'Modo sempre no topo inativo');
   AtualizarRotuloEstado;
 end;
 
@@ -76,7 +76,7 @@ begin
   else
   begin
     FRotuloEstado.Caption := 'Sempre no topo inativo';
-    FRotuloEstado.Font.Color := clSilver;
+    FRotuloEstado.Font.Color := $004040FF;
   end;
 end;
 

@@ -73,7 +73,6 @@ type
 implementation
 
 const
-  TECLA_ESPACO = $20;
   TECLA_PAGE_UP = $21;
   TECLA_PAGE_DOWN = $22;
   TECLA_END = $23;
@@ -201,15 +200,14 @@ procedure TCatalogoAtalhos.RestaurarPadroes;
 begin
   FillChar(FAtalhos, SizeOf(FAtalhos), 0);
   DefinirPadrao(cmdReproduzirPausar, 0, TECLA_F5);
-  DefinirPadrao(cmdReproduzirPausar, 1, TECLA_ESPACO, [maControle]);
-  DefinirPadrao(cmdTextoSeguinte, 0, TECLA_DIREITA, [maControle]);
-  DefinirPadrao(cmdTextoAnterior, 0, TECLA_ESQUERDA, [maControle]);
+  DefinirPadrao(cmdTextoSeguinte, 0, TECLA_DIREITA, [maAlt]);
+  DefinirPadrao(cmdTextoAnterior, 0, TECLA_ESQUERDA, [maAlt]);
   DefinirPadrao(cmdAvancarRolagem, 0, TECLA_DIREITA);
   DefinirPadrao(cmdAvancarRolagem, 1, TECLA_PAGE_DOWN);
   DefinirPadrao(cmdRecuarRolagem, 0, TECLA_ESQUERDA);
   DefinirPadrao(cmdRecuarRolagem, 1, TECLA_PAGE_UP);
-  DefinirPadrao(cmdAumentarVelocidade, 0, TECLA_CIMA, [maControle]);
-  DefinirPadrao(cmdDiminuirVelocidade, 0, TECLA_BAIXO, [maControle]);
+  DefinirPadrao(cmdAumentarVelocidade, 0, TECLA_CIMA, [maAlt]);
+  DefinirPadrao(cmdDiminuirVelocidade, 0, TECLA_BAIXO, [maAlt]);
   DefinirPadrao(cmdAumentarFonte, 0, TECLA_MAIS, [maControle]);
   DefinirPadrao(cmdDiminuirFonte, 0, TECLA_MENOS, [maControle]);
   DefinirPadrao(cmdEspelhoHorizontal, 0, Ord('H'), [maControle, maAlt]);

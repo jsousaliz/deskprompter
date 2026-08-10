@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       versao:
-        description: 'Versao sem o prefixo v, por exemplo: 0.1.0'
+        description: 'Versao sem o prefixo v, por exemplo: 1.1.0'
         required: true
         type: string
       modo_notas:
@@ -49,7 +49,7 @@ jobs:
         shell: powershell
         run: |
           if ($env:VERSAO -notmatch '^\d+\.\d+\.\d+$') {
-            throw "Versao invalida: $env:VERSAO. Use o formato 0.1.0."
+            throw "Versao invalida: $env:VERSAO. Use o formato 1.1.0."
           }
 
           if ($env:VERSAO -eq '0.0.0') {

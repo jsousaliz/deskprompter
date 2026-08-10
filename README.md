@@ -24,6 +24,9 @@ Teleprompter para Windows com organização de textos, rolagem automática, espe
 - Proteção de captura que pode ser ativada ou desativada durante a execução.
 - Modo sempre no topo para manter o roteiro visível ao trabalhar em outra
   janela.
+- Opção de ocultar o ícone da barra de tarefas sem alterar a janela.
+- Estados de proteção de captura, sempre no topo e barra de tarefas persistidos
+  localmente.
 
 ## Proteção contra captura
 

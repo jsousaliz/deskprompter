@@ -200,7 +200,8 @@ begin
       Consulta.SQL.Text :=
         'SELECT nome_fonte, tamanho_fonte, cor_fonte, cor_fundo, ' +
         'opacidade, margem, velocidade, espelho_horizontal, ' +
-        'espelho_vertical FROM preferencias WHERE id = 1';
+        'espelho_vertical, protecao_captura, sempre_no_topo, ' +
+        'ocultar_icone_barra_tarefas FROM preferencias WHERE id = 1';
       Consulta.Open;
       if not Consulta.Eof then
       begin
@@ -216,6 +217,12 @@ begin
           Consulta.FieldByName('espelho_horizontal').AsInteger <> 0;
         Result.EspelhoVertical :=
           Consulta.FieldByName('espelho_vertical').AsInteger <> 0;
+        Result.ProtecaoCaptura :=
+          Consulta.FieldByName('protecao_captura').AsInteger <> 0;
+        Result.SempreNoTopo :=
+          Consulta.FieldByName('sempre_no_topo').AsInteger <> 0;
+        Result.OcultarIconeBarraTarefas :=
+          Consulta.FieldByName('ocultar_icone_barra_tarefas').AsInteger <> 0;
       end;
 
       Consulta.Close;
@@ -277,6 +284,9 @@ begin
         'margem = :margem, velocidade = :velocidade, ' +
         'espelho_horizontal = :espelho_horizontal, ' +
         'espelho_vertical = :espelho_vertical, ' +
+        'protecao_captura = :protecao_captura, ' +
+        'sempre_no_topo = :sempre_no_topo, ' +
+        'ocultar_icone_barra_tarefas = :ocultar_icone_barra_tarefas, ' +
         'atualizado_em = CURRENT_TIMESTAMP WHERE id = 1';
       Consulta.ParamByName('nome_fonte').AsWideString :=
         APreferencias.NomeFonte;
@@ -291,6 +301,12 @@ begin
         Ord(APreferencias.EspelhoHorizontal);
       Consulta.ParamByName('espelho_vertical').AsInteger :=
         Ord(APreferencias.EspelhoVertical);
+      Consulta.ParamByName('protecao_captura').AsInteger :=
+        Ord(APreferencias.ProtecaoCaptura);
+      Consulta.ParamByName('sempre_no_topo').AsInteger :=
+        Ord(APreferencias.SempreNoTopo);
+      Consulta.ParamByName('ocultar_icone_barra_tarefas').AsInteger :=
+        Ord(APreferencias.OcultarIconeBarraTarefas);
       Consulta.ExecSQL;
 
       FConexao.ExecSQL('DELETE FROM atalhos');

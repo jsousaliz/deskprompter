@@ -270,14 +270,34 @@ object FormularioPrincipal: TFormularioPrincipal
       Margins.Bottom = 4
       Align = alLeft
       AutoSize = False
-      Caption = 'Sempre no topo ativo'
+      Caption = 'Sempre no topo inativo'
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = 6878097
+      Font.Color = 4210943
       Font.Height = -12
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
       ExplicitLeft = 351
+    end
+    object RotuloOcultarIconeBarraTarefas: TLabel
+      AlignWithMargins = True
+      Left = 562
+      Top = 9
+      Width = 210
+      Height = 21
+      Margins.Left = 4
+      Margins.Top = 8
+      Margins.Right = 8
+      Margins.Bottom = 4
+      Align = alLeft
+      AutoSize = False
+      Caption = 'Ocultar '#237'cone da barra de tarefas'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = 4210943
+      Font.Height = -12
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
     end
     object RotuloSalvamento: TLabel
       AlignWithMargins = True
@@ -343,10 +363,25 @@ object FormularioPrincipal: TFormularioPrincipal
       Margins.Bottom = 6
       Align = alLeft
       ShowStateCaption = False
-      State = tssOn
       TabOrder = 2
       OnClick = ChaveSempreNoTopoClick
-      ExplicitLeft = 200
+      ExplicitHeight = 20
+    end
+    object ChaveOcultarIconeBarraTarefas: TToggleSwitch
+      AlignWithMargins = True
+      Left = 504
+      Top = 7
+      Width = 50
+      Height = 21
+      Margins.Left = 4
+      Margins.Top = 6
+      Margins.Right = 4
+      Margins.Bottom = 6
+      Align = alLeft
+      ShowStateCaption = False
+      TabOrder = 3
+      OnClick = ChaveOcultarIconeBarraTarefasClick
+      ExplicitHeight = 20
     end
   end
   object PanelTextos: TPanel

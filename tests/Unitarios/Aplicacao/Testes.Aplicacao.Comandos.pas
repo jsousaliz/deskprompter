@@ -52,10 +52,15 @@ var
 begin
   Assert.IsTrue(FCatalogo.Localizar(TAtalho.Criar($74, []), Comando));
   Assert.AreEqual(Ord(cmdReproduzirPausar), Ord(Comando));
+  Assert.IsTrue(FCatalogo.Atalho(cmdReproduzirPausar, 1).Vazio);
   Assert.IsTrue(FCatalogo.Localizar(
-    TAtalho.Criar($20, [maControle]),
+    TAtalho.Criar($27, [maAlt]),
     Comando));
-  Assert.AreEqual(Ord(cmdReproduzirPausar), Ord(Comando));
+  Assert.AreEqual(Ord(cmdTextoSeguinte), Ord(Comando));
+  Assert.IsTrue(FCatalogo.Localizar(
+    TAtalho.Criar($26, [maAlt]),
+    Comando));
+  Assert.AreEqual(Ord(cmdAumentarVelocidade), Ord(Comando));
 end;
 
 procedure TTestesCatalogoAtalhos.Preparar;

@@ -47,9 +47,9 @@ type
     procedure Finalizar;
 
     [Test]
-    procedure IniciaAtivoEAplicaPosicionamento;
+    procedure IniciaInativoEAplicaPosicionamento;
     [Test]
-    procedure DesativaSemPersistirEstado;
+    procedure AtivaPosicionamento;
     [Test]
     procedure InformaFalhaAoAplicarPosicionamento;
   end;
@@ -81,13 +81,13 @@ begin
   UltimoNivel := ANivel;
 end;
 
-procedure TTestesControladorSempreNoTopo.DesativaSemPersistirEstado;
+procedure TTestesControladorSempreNoTopo.AtivaPosicionamento;
 begin
-  FControlador.DefinirAtivo(False, 123);
+  FControlador.DefinirAtivo(True, 123);
 
-  Assert.IsFalse(FControlador.Ativo);
-  Assert.IsFalse(FPosicionamentoFalso.AtivoRecebido);
-  Assert.AreEqual('Sempre no topo inativo', FRotulo.Caption);
+  Assert.IsTrue(FControlador.Ativo);
+  Assert.IsTrue(FPosicionamentoFalso.AtivoRecebido);
+  Assert.AreEqual('Sempre no topo ativo', FRotulo.Caption);
   Assert.AreEqual(nrInformacao, FRegistroFalso.UltimoNivel);
 end;
 
@@ -109,14 +109,15 @@ begin
   Assert.AreEqual(nrAviso, FRegistroFalso.UltimoNivel);
 end;
 
-procedure TTestesControladorSempreNoTopo.IniciaAtivoEAplicaPosicionamento;
+procedure TTestesControladorSempreNoTopo.IniciaInativoEAplicaPosicionamento;
 begin
   FControlador.Aplicar(123);
 
-  Assert.IsTrue(FControlador.Ativo);
+  Assert.IsFalse(FControlador.Ativo);
   Assert.AreEqual(1, FPosicionamentoFalso.Aplicacoes);
-  Assert.IsTrue(FPosicionamentoFalso.AtivoRecebido);
-  Assert.AreEqual('Sempre no topo ativo', FRotulo.Caption);
+  Assert.IsFalse(FPosicionamentoFalso.AtivoRecebido);
+  Assert.AreEqual('Sempre no topo inativo', FRotulo.Caption);
+  Assert.AreEqual($004040FF, Integer(FRotulo.Font.Color));
   Assert.AreEqual(nrInformacao, FRegistroFalso.UltimoNivel);
 end;
 

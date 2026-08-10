@@ -130,6 +130,43 @@ begin
       raise;
     end;
   end;
+
+  if VersaoAtual < 3 then
+  begin
+    FConexao.StartTransaction;
+    try
+      FConexao.ExecSQL(
+        'ALTER TABLE preferencias ADD COLUMN ' +
+        'protecao_captura INTEGER NOT NULL DEFAULT 1');
+      FConexao.ExecSQL(
+        'ALTER TABLE preferencias ADD COLUMN ' +
+        'sempre_no_topo INTEGER NOT NULL DEFAULT 0');
+      FConexao.ExecSQL(
+        'ALTER TABLE preferencias ADD COLUMN ' +
+        'ocultar_icone_barra_tarefas INTEGER NOT NULL DEFAULT 0');
+
+      FConexao.ExecSQL(
+        'UPDATE atalhos SET tecla = 0, modificadores = 0 ' +
+        'WHERE comando = 0 AND indice = 1 AND tecla = 32 ' +
+        'AND modificadores = 1');
+      FConexao.ExecSQL(
+        'UPDATE atalhos SET modificadores = 2 ' +
+        'WHERE comando IN (1, 2, 5, 6) AND indice = 0 ' +
+        'AND modificadores = 1 AND (' +
+        '  (comando = 1 AND tecla = 39) OR ' +
+        '  (comando = 2 AND tecla = 37) OR ' +
+        '  (comando = 5 AND tecla = 38) OR ' +
+        '  (comando = 6 AND tecla = 40)' +
+        ')');
+      FConexao.ExecSQL(
+        'INSERT INTO versoes_esquema (versao, aplicada_em) ' +
+        'VALUES (3, CURRENT_TIMESTAMP)');
+      FConexao.Commit;
+    except
+      FConexao.Rollback;
+      raise;
+    end;
+  end;
 end;
 
 procedure TBancoDadosSQLite.ConfigurarConexao;
